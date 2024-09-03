@@ -3,7 +3,95 @@
 }
 
 
+<style>
+    body {
+        background: linear-gradient(skyblue, red);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
 
+    .header-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        text-align: center;
+        color: white;
+        padding: 10px 0;
+        margin: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .form-container {
+        max-width: 1000px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-section {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="file"],
+    input[type="date"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        button[type="submit"]:hover,
+        button[type="submit"]:focus {
+            background-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        button[type="submit"]:active {
+            background-color: #004085;
+            transform: translateY(1px);
+        }
+
+    input[type="file"] {
+        border: 1px solid #ddd;
+        padding: 6px;
+        background-color: white;
+    }
+
+    footer {
+        display: none;
+    }
+
+</style>
 
 <div class="header-container">
     <h1>Submit Your Claim</h1>

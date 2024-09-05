@@ -2,7 +2,6 @@
     ViewData["Title"] = "Privacy Policy";
 }
 
-
 <style>
     body {
         background: linear-gradient(skyblue, red);
@@ -38,11 +37,11 @@
         border-bottom: 1px solid #ddd;
     }
 
-        .form-section:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
 
     input[type="text"],
     input[type="email"],
@@ -69,17 +68,17 @@
         transition: all 0.3s ease;
     }
 
-        button[type="submit"]:hover,
-        button[type="submit"]:focus {
-            background-color: #0056b3;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-            transform: translateY(-2px);
-        }
+    button[type="submit"]:hover,
+    button[type="submit"]:focus {
+        background-color: #0056b3;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        transform: translateY(-2px);
+    }
 
-        button[type="submit"]:active {
-            background-color: #004085;
-            transform: translateY(1px);
-        }
+    button[type="submit"]:active {
+        background-color: #004085;
+        transform: translateY(1px);
+    }
 
     input[type="file"] {
         border: 1px solid #ddd;
@@ -90,7 +89,6 @@
     footer {
         display: none;
     }
-
 </style>
 
 <div class="header-container">
@@ -108,12 +106,6 @@
             <input type="text" name="manager_id" placeholder="Manager ID" required />
             <input type="date" name="submissionDate" placeholder="Submission Date" required />
             <input type="number" name="hoursWorked" placeholder="Hours Worked" step="0.1" required />
-
-            <select name="claimStatus">
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-            </select>
 
             <p>Select the document you want to upload:</p>
             <input type="file" name="file" required />

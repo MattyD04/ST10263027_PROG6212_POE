@@ -119,4 +119,29 @@
     </div>
 </div>
 
+<!-- code below corrected by Chatgpt -->
+<script>
+    function updateClaimStatus(status) {
+        var statusLabel = document.getElementById('statusLabel');
 
+        switch (status) {
+            case 'Pending':
+                statusLabel.innerText = 'Status: Pending';
+                statusLabel.style.backgroundColor = '#ffc107'; // Yellow for Pending
+                break;
+            case 'Approved':
+                statusLabel.innerText = 'Status: Approved';
+                statusLabel.style.backgroundColor = '#28a745'; // Green for Approved
+                break;
+            case 'Rejected':
+                statusLabel.innerText = 'Status: Rejected';
+                statusLabel.style.backgroundColor = '#dc3545'; // Red for Rejected
+                break;
+            default:
+                statusLabel.innerText = 'Status: Unknown';
+                statusLabel.style.backgroundColor = '#6c757d'; // Grey for Unknown
+        }
+    }
+
+    updateClaimStatus('Pending'); // Default status
+</script>

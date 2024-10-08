@@ -37,18 +37,19 @@
         border-bottom: 1px solid #ddd;
     }
 
-    .form-section:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-    }
+        .form-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
 
     input[type="text"],
     input[type="email"],
     input[type="file"],
     input[type="date"],
     input[type="number"],
-    select {
+    select,
+    textarea {
         width: 100%;
         padding: 10px;
         margin-bottom: 10px;
@@ -68,17 +69,17 @@
         transition: all 0.3s ease;
     }
 
-    button[type="submit"]:hover,
-    button[type="submit"]:focus {
-        background-color: #0056b3;
-        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-        transform: translateY(-2px);
-    }
+        button[type="submit"]:hover,
+        button[type="submit"]:focus {
+            background-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            transform: translateY(-2px);
+        }
 
-    button[type="submit"]:active {
-        background-color: #004085;
-        transform: translateY(1px);
-    }
+        button[type="submit"]:active {
+            background-color: #004085;
+            transform: translateY(1px);
+        }
 
     input[type="file"] {
         border: 1px solid #ddd;
@@ -106,9 +107,11 @@
             <input type="text" name="manager_id" placeholder="Manager ID" required />
             <input type="date" name="submissionDate" placeholder="Submission Date" required />
             <input type="number" name="hoursWorked" placeholder="Hours Worked" step="0.1" required />
+            <input type="number" name="hourlyRate" placeholder="Hourly Rate" step="0.01" required />
+            <textarea name="additionalNotes" placeholder="Additional Notes (Optional)" rows="3"></textarea>
 
             <p>Select the document you want to upload:</p>
-            <input type="file" name="file" required />
+            <input type="file" name="file" required accept=".pdf,.docx,.xlsx" />
 
             <button type="submit">Submit Claim</button>
         </form>

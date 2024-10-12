@@ -46,7 +46,7 @@
             border-bottom: none;
         }
 
-    input[type="text"] {
+    input[type="text"], select {
         width: 100%;
         padding: 10px;
         margin-bottom: 10px;
@@ -54,6 +54,21 @@
         border-radius: 4px;
         box-sizing: border-box;
     }
+
+    .submit-btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
 
     table {
         width: 100%;
@@ -125,8 +140,13 @@
 <div class="form-container">
     <div class="form-section">
         <form id="validateForm" asp-action="ValidateClaim" method="post">
-            <input type="text" name="manager_id" placeholder="Academic Manager ID" required />
-            <input type="text" name="coordinator_id" placeholder="Programme Coordinator ID" required />
+            <select name="user_type" required>
+                <option value="">Select User Type</option>
+                <option value="academic_manager">Academic Manager</option>
+                <option value="programme_coordinator">Programme Coordinator</option>
+            </select>
+            <input type="text" name="user_id" placeholder="Enter your ID" required />
+            <button type="submit" class="submit-btn">Submit</button>
         </form>
     </div>
     <div class="form-section">

@@ -1,5 +1,5 @@
-﻿@{
-    ViewData["Title"] = "Track Claim";
+﻿@{ 
+ViewData["Title"] = "Track Claim";
 }
 
 <style>
@@ -57,17 +57,6 @@
         box-sizing: border-box;
     }
 
-    .status-label {
-        font-size: 20px;
-        font-weight: bold;
-        margin: 20px 0;
-        text-align: center;
-        padding: 10px;
-        color: white;
-        background-color: #007bff;
-        border-radius: 8px;
-    }
-
     button[type="submit"] {
         width: 100%;
         padding: 10px;
@@ -91,6 +80,12 @@
             transform: translateY(1px);
         }
 
+    input[type="file"] {
+        border: 1px solid #ddd;
+        padding: 6px;
+        background-color: white;
+    }
+
     footer {
         display: none;
     }
@@ -112,36 +107,4 @@
             <button type="submit">Track Claim</button>
         </form>
     </div>
-
-    <!-- Status Label for Claim Tracking -->
-    <div class="status-label" id="statusLabel">
-        Status: Pending
-    </div>
 </div>
-
-<!-- code below corrected by Chatgpt -->
-<script>
-    function updateClaimStatus(status) {
-        var statusLabel = document.getElementById('statusLabel');
-
-        switch (status) {
-            case 'Pending':
-                statusLabel.innerText = 'Status: Pending';
-                statusLabel.style.backgroundColor = '#ffc107'; // Yellow for Pending
-                break;
-            case 'Approved':
-                statusLabel.innerText = 'Status: Approved';
-                statusLabel.style.backgroundColor = '#28a745'; // Green for Approved
-                break;
-            case 'Rejected':
-                statusLabel.innerText = 'Status: Rejected';
-                statusLabel.style.backgroundColor = '#dc3545'; // Red for Rejected
-                break;
-            default:
-                statusLabel.innerText = 'Status: Unknown';
-                statusLabel.style.backgroundColor = '#6c757d'; // Grey for Unknown
-        }
-    }
-
-    updateClaimStatus('Pending'); // Default status
-</script>

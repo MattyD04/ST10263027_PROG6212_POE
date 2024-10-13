@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Submit Claim";
 }
 
 <style>
@@ -87,6 +87,15 @@
         background-color: white;
     }
 
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #c3e6cb;
+    }
+
     footer {
         display: none;
     }
@@ -98,13 +107,16 @@
 
 <div class="form-container">
     <div class="form-section">
+
+        @* Display the success message if TempData["SuccessMessage"] is set *@
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success" style="color: green;">
+            <div class="success-message">
                 @TempData["SuccessMessage"]
             </div>
         }
-        <form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+
+        <form asp-controller="Claims" asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
             <p>Please enter the details for your claim:</p>
 
             <input type="text" name="lecturer_number" placeholder="Lecturer Number" required />
@@ -121,4 +133,3 @@
         </form>
     </div>
 </div>
-

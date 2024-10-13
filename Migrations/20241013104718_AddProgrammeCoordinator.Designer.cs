@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ST10263027_PROG6212_POE.Data;
 
@@ -10,9 +11,11 @@ using ST10263027_PROG6212_POE.Data;
 namespace ST10263027_PROG6212_POE.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241013104718_AddProgrammeCoordinator")]
+    partial class AddProgrammeCoordinator
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,23 +23,6 @@ namespace ST10263027_PROG6212_POE.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ST10263027_PROG6212_POE.Models.AcademicManager", b =>
-                {
-                    b.Property<int>("ManagerID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ManagerID"));
-
-                    b.Property<string>("ManagerNum")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ManagerID");
-
-                    b.ToTable("AcademicManagers");
-                });
 
             modelBuilder.Entity("ST10263027_PROG6212_POE.Models.Lecturer", b =>
                 {

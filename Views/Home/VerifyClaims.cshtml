@@ -132,6 +132,13 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
+    .no-claims-message {
+        text-align: center;
+        font-style: italic;
+        color: #666;
+        padding: 20px;
+    }
 </style>
 
 <div class="header-container">
@@ -167,32 +174,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>CL001</td>
-                    <td>LEC123</td>
-                    <td>2024-10-10</td>
-                    <td>8</td>
-                    <td>$50</td>
-                    <td>$400</td>
-                    <td class="notes-cell" title="Extra hours due to project deadline">Extra hours due to project deadline</td>
-                    <td><button class="view-file-btn">View File</button></td>
-                    <td class="action-buttons">
-                        <button class="accept-btn">Accept</button>
-                        <button class="reject-btn">Reject</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>CL002</td>
-                    <td>LEC456</td>
-                    <td>2024-10-11</td>
-                    <td>6</td>
-                    <td>$55</td>
-                    <td>$330</td>
-                    <td class="notes-cell" title="Covered for absent colleague">Covered for absent colleague</td>
-                    <td><button class="view-file-btn">View File</button></td>
-                    <td class="action-buttons">
-                        <button class="accept-btn">Accept</button>
-                        <button class="reject-btn">Reject</button>
-                    </td>
+                    <td colspan="9" class="no-claims-message">No claims to display yet.</td>
                 </tr>
             </tbody>
         </table>

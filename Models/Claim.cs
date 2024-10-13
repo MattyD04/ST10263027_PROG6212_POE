@@ -30,3 +30,4 @@ namespace ST10263027_PROG6212_POE.Models
         public virtual AcademicManager Manager { get; set; }
     }
 }
+//-----------------------------------End of file--------------------------------------------//

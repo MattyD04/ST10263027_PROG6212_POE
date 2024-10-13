@@ -98,6 +98,12 @@
 
 <div class="form-container">
     <div class="form-section">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success" style="color: green;">
+                @TempData["SuccessMessage"]
+            </div>
+        }
         <form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
             <p>Please enter the details for your claim:</p>
 

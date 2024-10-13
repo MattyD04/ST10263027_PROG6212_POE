@@ -15,3 +15,5 @@ namespace ST10263027_PROG6212_POE.Models
         public double HoursWorked { get; set; }
     }
 }
+//-----------------------------------End of file--------------------------------------------//
+

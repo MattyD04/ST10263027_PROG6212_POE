@@ -29,7 +29,6 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Creates a new lecturer
                 var lecturer = new Lecturer
                 {
                     LecturerNum = lecturer_number,
@@ -40,18 +39,15 @@ namespace ST10263027_PROG6212_POE.Controllers
                 _context.Lecturers.Add(lecturer);
                 await _context.SaveChangesAsync();
 
-                // Creates a new claim
                 var claim = new Claim
                 {
                     ClaimNum = claim_number,
                     LecturerID = lecturer.LecturerId,
                     SubmissionDate = submissionDate,
                     ClaimStatus = "Pending",
-                    Comments = additionalNotes,
-                    
+                    Comments = additionalNotes
                 };
 
-                // This sectiion handles the uploading of a file
                 if (file != null && file.Length > 0)
                 {
                     using (var memoryStream = new MemoryStream())
@@ -67,6 +63,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Your claim has been submitted successfully.";
+                TempData["UploadedFileName"] = claim.Filename; // Stores the filename in TempData
                 return View("~/Views/Home/Privacy.cshtml");
             }
 
@@ -79,4 +76,3 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
     }
 }
-//-----------------------------------End of file--------------------------------------------//

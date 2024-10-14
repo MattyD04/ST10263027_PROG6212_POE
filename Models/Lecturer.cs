@@ -14,6 +14,9 @@ namespace ST10263027_PROG6212_POE.Models
         public double HourlyRate { get; set; }
         [Range(0, double.MaxValue)]
         public double HoursWorked { get; set; }
+        [Required]
+        [StringLength(100)] 
+        public string Password { get; set; }
     }
 }
 //-----------------------------------End of file--------------------------------------------//

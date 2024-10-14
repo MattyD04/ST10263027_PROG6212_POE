@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Lecturer Login";
+}
+
+
+<style>
+    body {
+        background: linear-gradient(skyblue, red);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, sans-serif;
+    }
+
+    h2 {
+        text-align: center;
+        color: white;
+        padding: 10px 0;
+        margin: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        height: 100vh;
+        padding-top: 150px;
+    }
+
+    .form-container {
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        color: white;
+        width: 300px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-top: 20px;
+        font-size: 18px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.7);
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: rgba(0, 0, 0, 0.9);
+    }
+</style>
+
+<div class="container">
+    <div class="form-container">
+        <h2>Login</h2>
+        <form asp-action="Login" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" required />
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</div>

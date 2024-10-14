@@ -6,11 +6,14 @@ namespace ST10263027_PROG6212_POE.Models
     public class AcademicManager
     {
         [Key]
-        public int ManagerID { get; set; } //Primary key for the AcademicManger table
+        public int ManagerID { get; set; } // Primary key for the AcademicManager table
         [Required]
-        public string ManagerNum { get; set; } //attribute to store the number for an Academic Manager 
-        
+        public string ManagerNum { get; set; } // Attribute to store the number for an Academic Manager 
+        [Required]
+        [StringLength(100)] 
+        public string Password { get; set; } // Password for the Academic Manager
     }
+
 }
 //-----------------------------------End of file--------------------------------------------//
 

@@ -32,6 +32,19 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View();
         }
+        public IActionResult LecturerLogin()
+        {
+            return View();
+        }
+
+        public IActionResult AcademicManagerLogin()
+        {
+            return View();
+        }
+        public IActionResult ProgrammeCoordinatorLogin()
+        {
+            return View();
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

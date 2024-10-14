@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Submit Claim";
 }
-<!-- code corrections done by Claude AI -->
 <style>
     body {
         background: linear-gradient(skyblue, red);
@@ -96,6 +95,15 @@
         border: 1px solid #c3e6cb;
     }
 
+    .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #f5c6cb;
+    }
+
     footer {
         display: none;
     }
@@ -126,6 +134,12 @@
                 @TempData["SuccessMessage"]
             </div>
         }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="error-message">
+                @TempData["ErrorMessage"]
+            </div>
+        }
         @if (TempData["UploadedFileName"] != null)
         {
             <div class="file-name">
@@ -139,8 +153,8 @@
             <input type="date" name="submissionDate" placeholder="Submission Date" required />
             <input type="number" name="hoursWorked" placeholder="Hours Worked" step="0.1" required />
             <input type="number" name="hourlyRate" placeholder="Hourly Rate" step="0.01" required />
-            <textarea name="additionalNotes" placeholder="Additional Notes (Optional)" rows="3"></textarea>
-            <p>Select the document you want to upload:</p>
+            <textarea name="additionalNotes" placeholder="Additional Notes (If none then type &quot;None&quot;)" rows="3"></textarea>
+            <p>Select the document you want to upload (Max size: 5 MB):</p>
             <input type="file" name="file" required accept=".pdf,.docx,.xlsx" />
             <button type="submit">Submit Claim</button>
         </form>

@@ -1,9 +1,7 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
     ViewData["Title"] = "Programme Coordinator Login";
 }
+
 <style>
     body {
         background: linear-gradient(skyblue, red);
@@ -58,17 +56,17 @@
         transition: all 0.3s ease;
     }
 
-    button[type="submit"]:hover,
-    button[type="submit"]:focus {
-        background-color: #0056b3;
-        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-        transform: translateY(-2px);
-    }
+        button[type="submit"]:hover,
+        button[type="submit"]:focus {
+            background-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            transform: translateY(-2px);
+        }
 
-    button[type="submit"]:active {
-        background-color: #004085;
-        transform: translateY(1px);
-    }
+        button[type="submit"]:active {
+            background-color: #004085;
+            transform: translateY(1px);
+        }
 
     .error-message {
         background-color: #f8d7da;
@@ -86,19 +84,25 @@
 
 <div class="form-container">
     <div class="form-section">
-        <h1>Programme Coordinator Login</h1> 
+        <h1>Programme Coordinator Login</h1>
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="error-message">
                 @TempData["ErrorMessage"]
             </div>
         }
-        <form asp-controller="Account" asp-action="Login" method="post">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="success-message">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        <form asp-controller="Login" asp-action="Login" method="post">
             <p>Please enter your login details:</p>
             <input type="text" name="username" placeholder="Username" required />
             <input type="password" name="password" placeholder="Password" required />
+            <input type="hidden" name="isCoordinator" value="true" />
             <button type="submit">Login</button>
         </form>
     </div>
 </div>
-

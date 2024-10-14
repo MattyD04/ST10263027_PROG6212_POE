@@ -2,6 +2,7 @@
 
 namespace ST10263027_PROG6212_POE.Models
 {
+    //table for the lecturers
     public class Lecturer
     {
         [Key]

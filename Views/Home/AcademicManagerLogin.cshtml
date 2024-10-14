@@ -1,5 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Lecturer Login";
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Academic Manager Login";
 }
 <style>
     body {
@@ -55,17 +58,17 @@
         transition: all 0.3s ease;
     }
 
-        button[type="submit"]:hover,
-        button[type="submit"]:focus {
-            background-color: #0056b3;
-            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-            transform: translateY(-2px);
-        }
+    button[type="submit"]:hover,
+    button[type="submit"]:focus {
+        background-color: #0056b3;
+        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+        transform: translateY(-2px);
+    }
 
-        button[type="submit"]:active {
-            background-color: #004085;
-            transform: translateY(1px);
-        }
+    button[type="submit"]:active {
+        background-color: #004085;
+        transform: translateY(1px);
+    }
 
     .error-message {
         background-color: #f8d7da;
@@ -83,7 +86,7 @@
 
 <div class="form-container">
     <div class="form-section">
-        <h1>Lecturer Login</h1> 
+        <h1>Academic Manager Login</h1> 
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="error-message">
@@ -98,3 +101,4 @@
         </form>
     </div>
 </div>
+

@@ -25,6 +25,13 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View("~/Views/Home/LecturerLogin.cshtml");
         }
+        
+        [HttpGet]
+        public IActionResult HandleManagerLogin()
+        {
+            return View("~/Views/Home/AcademicManagerLogin.cshtml");
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password, bool isManager = false, bool isCoordinator = false)
@@ -65,7 +72,8 @@ namespace ST10263027_PROG6212_POE.Controllers
                 _context.AcademicManagers.Add(academicManager);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Academic Manager account created successfully.";
+                TempData["SuccessMessage"] = "Academic Manager account created successfully. Please log in.";
+                return View("~/Views/Home/AcademicManagerLogin.cshtml");
             }
             else if (academicManager.Password != password)
             {
@@ -73,6 +81,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                 return View("~/Views/Home/AcademicManagerLogin.cshtml");
             }
 
+            // Successful login
             return RedirectToAction("VerifyClaims", "Home");
         }
 

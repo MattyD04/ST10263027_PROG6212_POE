@@ -13,27 +13,26 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             _context = context;
         }
+
         [HttpGet]
-        public IActionResult HandleCoordinatorLoginn()
+        public IActionResult HandleCoordinatorLogin()
         {
-            return View();
+            return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
         }
 
-        // GET: Login
         [HttpGet]
         public IActionResult Login()
         {
-            return View();
+            return View("~/Views/Home/LecturerLogin.cshtml");
         }
 
-        // POST: Login
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password, bool isManager = false, bool isCoordinator = false)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 TempData["ErrorMessage"] = "Please enter both Username and Password.";
-                return View(); // Stay on the same page
+                return View("~/Views/Home/LecturerLogin.cshtml");
             }
 
             if (isManager)
@@ -52,13 +51,11 @@ namespace ST10263027_PROG6212_POE.Controllers
 
         private async Task<IActionResult> HandleManagerLogin(string username, string password)
         {
-            // Handle login for Academic Manager
             var academicManager = await _context.AcademicManagers
                 .FirstOrDefaultAsync(am => am.ManagerNum == username);
 
             if (academicManager == null)
             {
-                // If the manager doesn't exist, create a new one
                 academicManager = new AcademicManager
                 {
                     ManagerNum = username,
@@ -72,33 +69,27 @@ namespace ST10263027_PROG6212_POE.Controllers
             }
             else if (academicManager.Password != password)
             {
-                // Invalid password
                 TempData["ErrorMessage"] = "Invalid password.";
-                return View("AcademicManagerLogin"); // Return to the Academic Manager login page
+                return View("~/Views/Home/AcademicManagerLogin.cshtml");
             }
 
-            // Redirect to VerifyClaims for Academic Manager
             return RedirectToAction("VerifyClaims", "Home");
         }
 
-
-        // POST: ProgrammeCoordinatorLogin
         [HttpPost]
         public async Task<IActionResult> HandleCoordinatorLogin(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 TempData["ErrorMessage"] = "Please enter both Username and Password.";
-                return View(); // Return to the same view
+                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
             }
 
-            // Handle login for Programme Coordinator
             var coordinator = await _context.ProgrammeCoordinators
                 .FirstOrDefaultAsync(pc => pc.CoordinatorNum == username);
 
             if (coordinator == null)
             {
-                // If the coordinator doesn't exist, create a new one
                 coordinator = new ProgrammeCoordinator
                 {
                     CoordinatorNum = username,
@@ -112,18 +103,15 @@ namespace ST10263027_PROG6212_POE.Controllers
             }
             else if (coordinator.Password != password)
             {
-                // Invalid password
                 TempData["ErrorMessage"] = "Invalid password.";
-                return View(); // Return to the same view
+                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
             }
 
-            // Redirect to VerifyClaims for Programme Coordinator
             return RedirectToAction("VerifyClaims", "Home");
         }
 
         private async Task<IActionResult> HandleLecturerLogin(string username, string password)
         {
-            // Handle login for Lecturer
             var lecturer = await _context.Lecturers
                 .FirstOrDefaultAsync(l => l.LecturerNum == username);
 
@@ -143,16 +131,15 @@ namespace ST10263027_PROG6212_POE.Controllers
             else if (lecturer.Password != password)
             {
                 TempData["ErrorMessage"] = "Invalid password.";
-                return View(); // Stay on the same page
+                return View("~/Views/Home/LecturerLogin.cshtml");
             }
 
-            // Redirect to Privacy for Lecturer
             return RedirectToAction("Privacy", "Home");
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View("~/Views/Home/Index.cshtml");
         }
     }
 }

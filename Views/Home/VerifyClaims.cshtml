@@ -155,8 +155,8 @@
                             <td>@claim.LecturerNum</td>
                             <td>@claim.SubmissionDate.ToString("yyyy-MM-dd")</td>
                             <td>@claim.HoursWorked</td>
-                            <td>@claim.HourlyRate.ToString("C")</td>
-                            <td>@claim.TotalAmount.ToString("C")</td>
+                            <td>@($"R{claim.HourlyRate:F2}")</td>
+                            <td>@($"R{claim.TotalAmount:F2}")</td>
                             <td class="notes-cell">@claim.Comments</td>
                             <td>@(string.IsNullOrEmpty(claim.Filename) ? "No file" : claim.Filename)</td>
                             <td class="action-buttons">

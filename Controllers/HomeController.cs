@@ -4,6 +4,7 @@ using ST10263027_PROG6212_POE.Models;
 using ST10263027_PROG6212_POE.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
@@ -33,7 +34,29 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
 
-        public IActionResult VerifyClaims() //method that handles the verification of claims by passing it to the table in the VerifyClaims View
+        [HttpPost]
+        public async Task<IActionResult> TrackClaim(string claim_number)
+        {
+            if (string.IsNullOrEmpty(claim_number))
+            {
+                TempData["ErrorMessage"] = "Claim Number is required.";
+                return View("TrackClaims"); // Specify the view name here
+            }
+
+            var claim = await _context.Claims
+                .FirstOrDefaultAsync(c => c.ClaimNum == claim_number);
+
+            if (claim == null)
+            {
+                TempData["ErrorMessage"] = "Claim not found for the provided claim number.";
+                return View("TrackClaims"); // Specify the view name here
+            }
+
+            ViewBag.ClaimStatus = claim.ClaimStatus;
+            return View("TrackClaims"); // Specify the view name here
+        }
+
+        public IActionResult VerifyClaims()
         {
             var claimViewModels = _context.Claims
                 .Where(claim => claim.ClaimStatus == "Pending")
@@ -55,12 +78,12 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ApproveClaim(int id) //method that handles the approval of claims
+        public async Task<IActionResult> ApproveClaim(int id)
         {
             var claim = await _context.Claims.FindAsync(id);
             if (claim != null)
             {
-                claim.ClaimStatus = "Approved";  //changes the claim status from pending to accepted
+                claim.ClaimStatus = "Approved";
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Claim has been approved successfully.";
             }
@@ -73,12 +96,12 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RejectClaim(int id) //method that handles the rejection of claims
+        public async Task<IActionResult> RejectClaim(int id)
         {
             var claim = await _context.Claims.FindAsync(id);
             if (claim != null)
             {
-                claim.ClaimStatus = "Rejected"; //changes the claim status from pending to rejected
+                claim.ClaimStatus = "Rejected";
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Claim has been rejected successfully.";
             }

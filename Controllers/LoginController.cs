@@ -15,7 +15,7 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
 
         [HttpGet]
-        public IActionResult HandleCoordinatorLogin()
+        public IActionResult HandleCoordinatorLogin() 
         {
             return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
         }
@@ -56,7 +56,7 @@ namespace ST10263027_PROG6212_POE.Controllers
             }
         }
 
-        private async Task<IActionResult> HandleManagerLogin(string username, string password)
+        private async Task<IActionResult> HandleManagerLogin(string username, string password) //method to handle the login of an Academic Manager (code corrections done by Claude AI)
         {
             var academicManager = await _context.AcademicManagers
                 .FirstOrDefaultAsync(am => am.ManagerNum == username);
@@ -72,21 +72,21 @@ namespace ST10263027_PROG6212_POE.Controllers
                 _context.AcademicManagers.Add(academicManager);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Academic Manager account created successfully. Please log in.";
-                return View("~/Views/Home/AcademicManagerLogin.cshtml");
+                TempData["SuccessMessage"] = "Academic Manager account created successfully. Please log in."; //displays if manager logged in correctly
+                return View("~/Views/Home/AcademicManagerLogin.cshtml"); //directs to the Academic Manager view
             }
             else if (academicManager.Password != password)
             {
                 TempData["ErrorMessage"] = "Invalid password.";
-                return View("~/Views/Home/AcademicManagerLogin.cshtml");
+                return View("~/Views/Home/AcademicManagerLogin.cshtml"); //displays if the password already stored in the DB does not match the manager's number
             }
 
             // Successful login
-            return RedirectToAction("VerifyClaims", "Home");
+            return RedirectToAction("VerifyClaims", "Home"); //after a successful login, the manager is redirected to the relevant page
         }
 
         [HttpPost]
-        public async Task<IActionResult> HandleCoordinatorLogin(string username, string password)
+        public async Task<IActionResult> HandleCoordinatorLogin(string username, string password)//method to handle the login of a programme coordinator
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {

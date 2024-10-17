@@ -21,7 +21,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitClaim(
+        public async Task<IActionResult> SubmitClaim( //method to handle the submission of claims (corrections by Claude AI)
            string lecturer_number,
            string claim_number,
            DateTime submissionDate,
@@ -104,73 +104,6 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
 
-        public IActionResult VerifyClaims()
-        {
-            // Fetch only the claims with status "Pending" directly in the query
-            var claimViewModels = _context.Claims
-                .Where(claim => claim.ClaimStatus == "Pending") // Filter by "Pending" status within the query
-                .Select(claim => new ClaimViewModel
-                {
-                    ClaimNum = claim.ClaimNum,
-                    LecturerNum = claim.Lecturer.LecturerNum,
-                    SubmissionDate = claim.SubmissionDate,
-                    HoursWorked = claim.Lecturer.HoursWorked,
-                    HourlyRate = claim.Lecturer.HourlyRate,
-                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
-                    Comments = claim.Comments,
-                    Filename = claim.Filename
-                })
-                .ToList();
-
-            // If the list is null, initialize it as an empty list
-            if (claimViewModels == null)
-            {
-                claimViewModels = new List<ClaimViewModel>();
-            }
-
-            return View(claimViewModels);
-        }
-
-        // Action to approve a claim
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ApproveClaim(int id)
-        {
-            var claim = await _context.Claims.FindAsync(id);
-            if (claim != null)
-            {
-                claim.ClaimStatus = "Approved";
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Claim has been approved successfully.";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found.";
-            }
-
-            return RedirectToAction(nameof(VerifyClaims));
-        }
-
-        // Action to reject a claim
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RejectClaim(int id)
-        {
-            var claim = await _context.Claims.FindAsync(id);
-            if (claim != null)
-            {
-                claim.ClaimStatus = "Rejected";
-                await _context.SaveChangesAsync();
-
-                TempData["ErrorMessage"] = "Claim has been rejected.";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found.";
-            }
-
-            return RedirectToAction(nameof(VerifyClaims));
-        }
+        
     }
 }

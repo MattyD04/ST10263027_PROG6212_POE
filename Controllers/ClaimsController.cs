@@ -30,10 +30,10 @@ namespace ST10263027_PROG6212_POE.Controllers
            string additionalNotes,
            IFormFile file)
         {
-            // Check if the model state is valid
+            // Checks to see if the model state is valid
             if (ModelState.IsValid)
             {
-                // Validate file size if file exists
+                // Validates file size if file exists
                 if (file != null)
                 {
                     if (file.Length > MaxFileSizeBytes)
@@ -43,7 +43,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                         return View();
                     }
 
-                    // Validate file extension
+                    // Validates file extension
                     string[] allowedExtensions = { ".pdf", ".docx", ".xlsx" };
                     var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
                     if (!allowedExtensions.Contains(fileExtension))
@@ -54,20 +54,20 @@ namespace ST10263027_PROG6212_POE.Controllers
                     }
                 }
 
-                // Create Lecturer object
+                // Creates Lecturer object if it does not exist
                 var lecturer = new Lecturer
                 {
                     LecturerNum = lecturer_number,
                     HourlyRate = hourlyRate,
                     HoursWorked = hoursWorked,
-                    Password = "default_password" // Assign a default password
+                    Password = "default_password" // Assigns a default password (for error handling)
                 };
 
                 // Add lecturer to the database
                 _context.Lecturers.Add(lecturer);
                 await _context.SaveChangesAsync();
 
-                // Create Claim object
+                // Creates a Claim object if it does not exist
                 var claim = new Claim
                 {
                     ClaimNum = claim_number,
@@ -93,11 +93,11 @@ namespace ST10263027_PROG6212_POE.Controllers
                 _context.Claims.Add(claim);
                 await _context.SaveChangesAsync();
 
-                // Set success message and redirect
-                TempData["SuccessMessage"] = "Your claim has been submitted successfully.";
-                TempData["UploadedFileName"] = claim.Filename;
+                
+                TempData["SuccessMessage"] = "Your claim has been submitted successfully."; //message displays if the claim has been submitted successfully
+                TempData["UploadedFileName"] = claim.Filename; //displays the name of the file submitted
 
-                return RedirectToAction("Privacy", "Home");
+                return RedirectToAction("Privacy", "Home"); //redirects back to the Claim submission form so more claims can be submitted
             }
 
             // If model state is not valid, return to the form

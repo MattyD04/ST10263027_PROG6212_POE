@@ -39,8 +39,8 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             if (string.IsNullOrEmpty(claim_number))
             {
-                TempData["ErrorMessage"] = "Claim Number is required.";
-                return View("TrackClaims"); // Specify the view name here
+                TempData["ErrorMessage"] = "Claim Number is required."; //displays if the user clicks on the Track Claim button without filling in the Claim Number
+                return View("TrackClaims"); //redirects to the Track Claims page
             }
 
             var claim = await _context.Claims
@@ -48,29 +48,29 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             if (claim == null)
             {
-                TempData["ErrorMessage"] = "Claim not found for the provided claim number.";
-                return View("TrackClaims"); // Specify the view name here
+                TempData["ErrorMessage"] = "Claim not found for the provided claim number."; //displays a message if the claim does not exist or the claim number is wrong
+                return View("TrackClaims"); //redirects to the Track Claims page
             }
 
             ViewBag.ClaimStatus = claim.ClaimStatus;
-            return View("TrackClaims"); // Specify the view name here
+            return View("TrackClaims"); //redirects to the Track Claims page
         }
 
-        public IActionResult VerifyClaims()
+        public IActionResult VerifyClaims() //method to handle the verification of claims by passing the information of the claim to the table in the Verify Claims page
         {
             var claimViewModels = _context.Claims
                 .Where(claim => claim.ClaimStatus == "Pending")
                 .Select(claim => new ClaimViewModel
                 {
-                    ClaimID = claim.ClaimID,
-                    ClaimNum = claim.ClaimNum,
-                    LecturerNum = claim.Lecturer.LecturerNum,
-                    SubmissionDate = claim.SubmissionDate,
-                    HoursWorked = claim.Lecturer.HoursWorked,
-                    HourlyRate = claim.Lecturer.HourlyRate,
-                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
-                    Comments = claim.Comments,
-                    Filename = claim.Filename
+                    ClaimID = claim.ClaimID, //fetches the ClaimID
+                    ClaimNum = claim.ClaimNum, //fetches the Claim Number
+                    LecturerNum = claim.Lecturer.LecturerNum, //fetches the Lecturer Number
+                    SubmissionDate = claim.SubmissionDate, //fetches the submission date of the claim
+                    HoursWorked = claim.Lecturer.HoursWorked, //fetches the lecturer's hoursworked
+                    HourlyRate = claim.Lecturer.HourlyRate, // fetches the lecturer's hourly rate
+                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate, //calculates the total amount of the contract by multiplying the lecturer's hoursworked and hourly rate
+                    Comments = claim.Comments, //fetches the comments submitted by the lecturer
+                    Filename = claim.Filename //fetches the name of the file submitted by the lecturer
                 })
                 .ToList();
 
@@ -78,39 +78,39 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ApproveClaim(int id)
+        public async Task<IActionResult> ApproveClaim(int id) //method for handling the approval of a claim
         {
             var claim = await _context.Claims.FindAsync(id);
             if (claim != null)
             {
-                claim.ClaimStatus = "Approved";
+                claim.ClaimStatus = "Approved"; 
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Claim has been approved successfully.";
+                TempData["SuccessMessage"] = "Claim has been approved successfully."; //displays if a claim is approved
             }
             else
             {
-                TempData["ErrorMessage"] = "Claim not found.";
+                TempData["ErrorMessage"] = "Claim not found."; //displays if a claim is not found
             }
 
-            return RedirectToAction(nameof(VerifyClaims));
+            return RedirectToAction(nameof(VerifyClaims)); //redirects to the Verify Claims page so a Coordinator or Manager can approve or reject more complains
         }
 
         [HttpPost]
-        public async Task<IActionResult> RejectClaim(int id)
+        public async Task<IActionResult> RejectClaim(int id) //method for handling the rejection of a claim
         {
             var claim = await _context.Claims.FindAsync(id);
             if (claim != null)
             {
                 claim.ClaimStatus = "Rejected";
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Claim has been rejected successfully.";
+                TempData["SuccessMessage"] = "Claim has been rejected successfully."; //displays if a claim is rejected successfully
             }
             else
             {
                 TempData["ErrorMessage"] = "Claim not found.";
             }
 
-            return RedirectToAction(nameof(VerifyClaims));
+            return RedirectToAction(nameof(VerifyClaims));  //redirects to the Verify Claims page so a Coordinator or Manager can approve or reject more complains
         }
 
         public IActionResult LecturerLogin()

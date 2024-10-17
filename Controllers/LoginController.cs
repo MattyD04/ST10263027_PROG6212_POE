@@ -63,7 +63,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             if (academicManager == null)
             {
-                academicManager = new AcademicManager
+                academicManager = new AcademicManager //if manger is signing in for the first time, this creates a new manager
                 {
                     ManagerNum = username,
                     Password = password
@@ -90,8 +90,8 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                TempData["ErrorMessage"] = "Please enter both Username and Password.";
-                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
+                TempData["ErrorMessage"] = "Please enter both Username and Password."; //displays if a Coordinator does not enter their username and password
+                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml"); //redirects back to the login page
             }
 
             var coordinator = await _context.ProgrammeCoordinators
@@ -99,7 +99,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             if (coordinator == null)
             {
-                coordinator = new ProgrammeCoordinator
+                coordinator = new ProgrammeCoordinator //if a Coordinator is signing in for the first time, this creates a new Coordinator
                 {
                     CoordinatorNum = username,
                     Password = password
@@ -108,25 +108,25 @@ namespace ST10263027_PROG6212_POE.Controllers
                 _context.ProgrammeCoordinators.Add(coordinator);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Programme Coordinator account created successfully.";
+                TempData["SuccessMessage"] = "Programme Coordinator account created successfully."; //message displays if a Programme Coordinator signs in successfully
             }
-            else if (coordinator.Password != password)
+            else if (coordinator.Password != password) 
             {
-                TempData["ErrorMessage"] = "Invalid password.";
-                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
+                TempData["ErrorMessage"] = "Invalid password."; //if the Programme Coordinator is logging in and the password does not match their number, this message displays
+                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml"); //redirects back to the login page so that the coordinator can try logging in again
             }
 
-            return RedirectToAction("VerifyClaims", "Home");
+            return RedirectToAction("VerifyClaims", "Home");//directs to the Verify Claims form once the Coordinator is logged in successfully
         }
 
-        private async Task<IActionResult> HandleLecturerLogin(string username, string password)
+        private async Task<IActionResult> HandleLecturerLogin(string username, string password) //this method handles the login for the lecturer
         {
             var lecturer = await _context.Lecturers
                 .FirstOrDefaultAsync(l => l.LecturerNum == username);
 
             if (lecturer == null)
             {
-                lecturer = new Lecturer
+                lecturer = new Lecturer //if a lecturer is signing in for the first time, this creates a new lecturer
                 {
                     LecturerNum = username,
                     Password = password
@@ -135,15 +135,15 @@ namespace ST10263027_PROG6212_POE.Controllers
                 _context.Lecturers.Add(lecturer);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Lecturer account created successfully.";
+                TempData["SuccessMessage"] = "Lecturer account created successfully."; //displays if the signing in/logging in of lecturers is successful
             }
             else if (lecturer.Password != password)
             {
-                TempData["ErrorMessage"] = "Invalid password.";
-                return View("~/Views/Home/LecturerLogin.cshtml");
+                TempData["ErrorMessage"] = "Invalid password."; //if the password does not match a lecturer's number, this message displays
+                return View("~/Views/Home/LecturerLogin.cshtml"); //returns back to the login view so the lecturer can try again
             }
 
-            return RedirectToAction("Privacy", "Home");
+            return RedirectToAction("Privacy", "Home"); //directs to the claims submission form if signing in/logging is successful
         }
 
         public IActionResult Index()

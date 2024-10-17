@@ -1,7 +1,8 @@
-﻿@{
-    ViewData["Title"] = "Validate Claim";
+﻿@model IEnumerable<ST10263027_PROG6212_POE.Models.ClaimViewModel>
+@{
+    ViewData["Title"] = "Verify Claims";
 }
-<!-- code corrections done by Claude AI -->
+
 <style>
     body {
         background: linear-gradient(skyblue, red);
@@ -10,6 +11,7 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
     }
 
     .header-container {
@@ -20,7 +22,7 @@
     h1 {
         text-align: center;
         color: white;
-        padding: 10px 0;
+        padding: 20px 0;
         margin: 0;
         background-color: rgba(0, 0, 0, 0.5);
     }
@@ -36,54 +38,24 @@
 
     .form-section {
         margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #ddd;
     }
-
-        .form-section:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-    input[type="text"], select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-
-    .submit-btn {
-        width: 100%;
-        padding: 10px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-        .submit-btn:hover {
-            background-color: #45a049;
-        }
 
     table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 20px;
+        background-color: white;
     }
 
     th, td {
         border: 1px solid #ddd;
-        padding: 8px;
+        padding: 12px;
         text-align: left;
     }
 
     th {
         background-color: #f2f2f2;
+        font-weight: bold;
     }
 
     .action-buttons {
@@ -91,7 +63,7 @@
         justify-content: space-between;
     }
 
-    .accept-btn, .reject-btn, .view-file-btn {
+    .accept-btn, .reject-btn {
         padding: 5px 10px;
         border: none;
         border-radius: 4px;
@@ -109,21 +81,12 @@
         color: white;
     }
 
-    .view-file-btn {
-        background-color: #008CBA;
-        color: white;
-    }
-
     .accept-btn:hover {
         background-color: #45a049;
     }
 
     .reject-btn:hover {
         background-color: #da190b;
-    }
-
-    .view-file-btn:hover {
-        background-color: #007a9e;
     }
 
     .notes-cell {
@@ -139,44 +102,95 @@
         color: #666;
         padding: 20px;
     }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+
+    .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border-color: #ebccd1;
+    }
 </style>
 
 <div class="header-container">
-    <h1>Validate Claim</h1>
+    <h1>Verify Claims</h1>
 </div>
+
 <div class="form-container">
     <div class="form-section">
-        <form id="validateForm" asp-action="ValidateClaim" method="post">
-            <select name="user_type" required>
-                <option value="">Select User Type</option>
-                <option value="academic_manager">Academic Manager</option>
-                <option value="programme_coordinator">Programme Coordinator</option>
-            </select>
-            <input type="text" name="user_id" placeholder="Enter your ID" required />
-            <button type="submit" class="submit-btn">Submit</button>
-        </form>
-    </div>
-    <div class="form-section">
         <h2>Pending Claims</h2>
+        <p>Claims found: @(Model?.Count() ?? 0)</p>
         <table>
             <thead>
                 <tr>
-                    <th>Claim ID</th>
-                    <th>Lecturer ID</th>
+                    <th>Claim Number</th>
+                    <th>Lecturer Number</th>
                     <th>Submission Date</th>
                     <th>Hours Worked</th>
                     <th>Hourly Rate</th>
                     <th>Total Amount</th>
-                    <th>Additional Notes</th>
-                    <th>Submitted File</th>
+                    <th>Comments</th>
+                    <th>File Name</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="9" class="no-claims-message">No claims to display yet.</td>
-                </tr>
+                @if (Model?.Any() == true)
+                {
+                    foreach (var claim in Model)
+                    {
+                        <tr>
+                            <td>@claim.ClaimNum</td>
+                            <td>@claim.LecturerNum</td>
+                            <td>@claim.SubmissionDate.ToString("yyyy-MM-dd")</td>
+                            <td>@claim.HoursWorked</td>
+                            <td>@claim.HourlyRate.ToString("C")</td>
+                            <td>@claim.TotalAmount.ToString("C")</td>
+                            <td class="notes-cell">@claim.Comments</td>
+                            <td>@(string.IsNullOrEmpty(claim.Filename) ? "No file" : claim.Filename)</td>
+                            <td class="action-buttons">
+                                <form method="post" action="@Url.Action("ApproveClaim", "Home", new { id = claim.ClaimID })">
+                                    <button type="submit" class="accept-btn">Approve</button>
+                                </form>
+                                <form method="post" action="@Url.Action("RejectClaim", "Home", new { id = claim.ClaimID })">
+                                    <button type="submit" class="reject-btn">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9" class="no-claims-message">No pending claims to display.</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 </div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}

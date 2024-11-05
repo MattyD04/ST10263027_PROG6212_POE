@@ -7,7 +7,7 @@ $(document).ready(function () {
     const $fileInput = $('input[type="file"]');
     const $totalAmountDisplay = $('.total-amount-display');
 
-    // Function to calculate and display total amount
+    // Function to calculate and display total amount of a lecturer's claim
     function calculateTotal() {
         const hours = parseFloat($hoursWorked.val()) || 0;
         const rate = parseFloat($hourlyRate.val()) || 0;
@@ -20,13 +20,13 @@ $(document).ready(function () {
         }
     }
 
-    // Input validation functions
+    
     function validateHours(hours) {
-        return hours > 0 && hours <= 160; // Maximum 160 hours per month
+        return hours > 0 && hours <= 200; // Maximum 200 hours per month for a lecturer to be able to work
     }
 
     function validateRate(rate) {
-        return rate > 0 && rate <= 1000; // Maximum rate of R1000 per hour
+        return rate > 0 && rate <= 1000; // Maximum rate of R1000 per hour for a lecturer's work
     }
 
     function validateFileSize() {
@@ -38,23 +38,23 @@ $(document).ready(function () {
         return true;
     }
 
-    // Add input event listeners for real-time calculation
+   
     $hoursWorked.on('input', function () {
-        calculateTotal();
+        calculateTotal(); //calling the calculateTotal method 
     });
 
     $hourlyRate.on('input', function () {
-        calculateTotal();
+        calculateTotal(); //calling the calculateTotal method 
     });
 
-    // File input validation
+    
     $fileInput.on('change', function () {
-        const $existingError = $(this).next('.invalid-feedback');
+        const $existingError = $(this).next('.invalid-feedback'); 
 
         if (!validateFileSize()) {
             $(this).addClass('is-invalid');
             if ($existingError.length === 0) {
-                $(this).after('<div class="invalid-feedback">File size must not exceed 5MB</div>');
+                $(this).after('<div class="invalid-feedback">File size must not exceed 5MB</div>'); //validating the file size to not exceed 5MB
             }
         } else {
             $(this).removeClass('is-invalid');
@@ -62,32 +62,34 @@ $(document).ready(function () {
         }
     });
 
-    // This section handles the submission of the claim form
-    $form.on('submit', function (e) {
+    
+    $form.on('submit', function (e)
+        // This section handles the submission of the claim form
+    {
         const hours = parseFloat($hoursWorked.val());
         const rate = parseFloat($hourlyRate.val());
 
-        // Clear any existing error messages
+        // Clear any existing error messages so that no error messages repeat
         $('.invalid-feedback').remove();
         $('.is-invalid').removeClass('is-invalid');
 
         let isValid = true;
 
-        // Validate hours
+        // Validate the lecturer's hours worked
         if (!validateHours(hours)) {
             $hoursWorked.addClass('is-invalid');
-            $hoursWorked.after('<div class="invalid-feedback">Please enter valid hours (1-160)</div>');
+            $hoursWorked.after('<div class="invalid-feedback">Please enter valid hours (1-200)</div>');
             isValid = false;
         }
 
-        // Validate rate
+        // Validate the lecturer's hourly rate
         if (!validateRate(rate)) {
             $hourlyRate.addClass('is-invalid');
             $hourlyRate.after('<div class="invalid-feedback">Please enter valid rate (1-1000)</div>');
             isValid = false;
         }
 
-        // Validate file size
+        // Validate file size so it does not exceed 5MB
         if (!validateFileSize()) {
             $fileInput.addClass('is-invalid');
             $fileInput.after('<div class="invalid-feedback">File size must not exceed 5MB</div>');
@@ -95,7 +97,7 @@ $(document).ready(function () {
         }
 
         if (!isValid) {
-            e.preventDefault(); // Prevent form submission if validation fails
+            e.preventDefault(); // Prevent form submission if validation fails, aiding in error handling 
         }
     });
 });

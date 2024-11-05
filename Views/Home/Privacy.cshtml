@@ -178,13 +178,19 @@
 
         <form asp-controller="Claims" asp-action="SubmitClaim" method="post" enctype="multipart/form-data" id="claimForm">
             <p>Please enter the details for your claim:</p>
+            <p>Enter your lecturer number</p>
             <input type="text" name="lecturer_number" placeholder="Lecturer Number" required />
+            <p>Enter a unique claim number for your claim:</p>
             <input type="text" name="claim_number" placeholder="Claim Number" required />
+            <p>Select the date you are submitting this form:</p>
             <input type="date" name="submissionDate" placeholder="Submission Date" required />
+            <p>Enter your total hours that you will work in a month</p>
             <input type="number" name="hoursWorked" placeholder="Hours Worked" step="0.1" required />
+            <p>Enter your hourly rate</p>
             <input type="number" name="hourlyRate" placeholder="Hourly Rate" step="0.01" required />
 
             <div class="total-amount-display" id="totalAmountDisplay"></div>
+            <p>If you have any notes then please add, if no notes type in "None"</p>
             <textarea name="additionalNotes" placeholder="Additional Notes (If none then type &quot;None&quot;)" rows="3"></textarea>
             <p>Select the document you want to upload (Max size: 5 MB):</p>
             <input type="file" name="file" required accept=".pdf,.docx,.xlsx" />

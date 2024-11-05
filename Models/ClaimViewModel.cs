@@ -14,3 +14,4 @@
         public string Filename { get; set; } //name of the file in the claim table
     }
 }
+//**************************************************end of file***********************************************//

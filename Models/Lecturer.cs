@@ -22,3 +22,4 @@ namespace ST10263027_PROG6212_POE.Models
         public string Password { get; set; } // Attribute to store a lecturer's password, allowing null values
     }
 }
+//**************************************************end of file***********************************************//

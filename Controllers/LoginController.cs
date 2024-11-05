@@ -55,7 +55,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                 return await HandleLecturerLogin(username, password);
             }
         }
-
+        //****************************************************************************************************************************//
         private async Task<IActionResult> HandleManagerLogin(string username, string password) //method to handle the login of an Academic Manager (code corrections done by Claude AI)
         {
             var academicManager = await _context.AcademicManagers
@@ -84,7 +84,7 @@ namespace ST10263027_PROG6212_POE.Controllers
             // Successful login
             return RedirectToAction("VerifyClaims", "Home"); //after a successful login, the manager is redirected to the relevant page
         }
-
+        //****************************************************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> HandleCoordinatorLogin(string username, string password)//method to handle the login of a programme coordinator
         {
@@ -118,7 +118,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction("VerifyClaims", "Home");//directs to the Verify Claims form once the Coordinator is logged in successfully
         }
-
+        //****************************************************************************************************************************//
         private async Task<IActionResult> HandleLecturerLogin(string username, string password) //this method handles the login for the lecturer
         {
             var lecturer = await _context.Lecturers
@@ -145,10 +145,11 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction("Privacy", "Home"); //directs to the claims submission form if signing in/logging is successful
         }
-
+        //****************************************************************************************************************************//
         public IActionResult Index()
         {
             return View("~/Views/Home/Index.cshtml");
         }
     }
 }
+//****************************************end of file***********************************************//

@@ -2,6 +2,10 @@
     ViewData["Title"] = "Submit Claim";
 }
 <!-- Code corrections done by Claude -->
+@{
+    ViewData["Title"] = "Submit Claim";
+}
+
 <style>
     body {
         background: linear-gradient(skyblue, red);
@@ -123,10 +127,37 @@
         margin-bottom: 20px;
         border: 1px solid #c3e6cb;
     }
+
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: -8px;
+        margin-bottom: 10px;
+    }
+
+    /* New styles for total amount display */
+    .total-amount-display {
+        background-color: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+        font-size: 1.1em;
+        text-align: right;
+    }
+
+        .total-amount-display strong {
+            color: #28a745;
+        }
 </style>
+
 <div class="header-container">
     <h1>Submit Your Claim</h1>
 </div>
+
 <div class="form-container">
     <div class="form-section">
         @if (TempData["SuccessMessage"] != null)
@@ -147,13 +178,16 @@
                 Uploaded file: @TempData["UploadedFileName"]
             </div>
         }
-        <form asp-controller="Claims" asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+
+        <form asp-controller="Claims" asp-action="SubmitClaim" method="post" enctype="multipart/form-data" id="claimForm">
             <p>Please enter the details for your claim:</p>
             <input type="text" name="lecturer_number" placeholder="Lecturer Number" required />
             <input type="text" name="claim_number" placeholder="Claim Number" required />
             <input type="date" name="submissionDate" placeholder="Submission Date" required />
             <input type="number" name="hoursWorked" placeholder="Hours Worked" step="0.1" required />
             <input type="number" name="hourlyRate" placeholder="Hourly Rate" step="0.01" required />
+            
+            <div class="total-amount-display"></div>
             <textarea name="additionalNotes" placeholder="Additional Notes (If none then type &quot;None&quot;)" rows="3"></textarea>
             <p>Select the document you want to upload (Max size: 5 MB):</p>
             <input type="file" name="file" required accept=".pdf,.docx,.xlsx" />
@@ -161,3 +195,8 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="~/js/LecturerClaimForm.js"></script>
+}

@@ -15,7 +15,7 @@
     }
 
     .header-container {
-        max-width: 1000px;
+        max-width: 1400px;
         margin: 0 auto;
     }
 
@@ -28,7 +28,7 @@
     }
 
     .form-container {
-        max-width: 1000px;
+        max-width: 1400px;
         margin: 20px auto;
         padding: 20px;
         background-color: #f9f9f9;
@@ -51,6 +51,7 @@
         border: 1px solid #ddd;
         padding: 12px;
         text-align: left;
+        white-space: normal;
     }
 
     th {
@@ -60,7 +61,8 @@
 
     .action-buttons {
         display: flex;
-        justify-content: space-between;
+        gap: 10px;
+        justify-content: flex-start;
     }
 
     .accept-btn, .reject-btn {
@@ -69,6 +71,7 @@
         border-radius: 4px;
         cursor: pointer;
         transition: background-color 0.3s;
+        font-size: 0.9rem;
     }
 
     .accept-btn {
@@ -105,9 +108,10 @@
 
     .alert {
         padding: 15px;
-        margin-bottom: 20px;
+        margin: 20px auto;
         border: 1px solid transparent;
         border-radius: 4px;
+        max-width: 1400px;
     }
 
     .alert-success {
@@ -121,64 +125,14 @@
         background-color: #f2dede;
         border-color: #ebccd1;
     }
+
+    .table-wrapper {
+        width: 100%;
+    }
 </style>
 
 <div class="header-container">
     <h1>Verify Claims</h1>
-</div>
-
-<div class="form-container">
-    <div class="form-section">
-        <h2>Pending Claims</h2>
-        <p>Claims found: @(Model?.Count() ?? 0)</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Claim Number</th>
-                    <th>Lecturer Number</th>
-                    <th>Submission Date</th>
-                    <th>Hours Worked</th>
-                    <th>Hourly Rate</th>
-                    <th>Total Amount</th>
-                    <th>Comments</th>
-                    <th>File Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model?.Any() == true)
-                {
-                    foreach (var claim in Model)
-                    {
-                        <tr>
-                            <td>@claim.ClaimNum</td>
-                            <td>@claim.LecturerNum</td>
-                            <td>@claim.SubmissionDate.ToString("yyyy-MM-dd")</td>
-                            <td>@claim.HoursWorked</td>
-                            <td>@($"R{claim.HourlyRate:F2}")</td>
-                            <td>@($"R{claim.TotalAmount:F2}")</td>
-                            <td class="notes-cell">@claim.Comments</td>
-                            <td>@(string.IsNullOrEmpty(claim.Filename) ? "No file" : claim.Filename)</td>
-                            <td class="action-buttons">
-                                <form method="post" action="@Url.Action("ApproveClaim", "Home", new { id = claim.ClaimID })">
-                                    <button type="submit" class="accept-btn">Approve</button>
-                                </form>
-                                <form method="post" action="@Url.Action("RejectClaim", "Home", new { id = claim.ClaimID })">
-                                    <button type="submit" class="reject-btn">Reject</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="9" class="no-claims-message">No pending claims to display.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
 </div>
 
 @if (TempData["SuccessMessage"] != null)
@@ -194,3 +148,60 @@
         @TempData["ErrorMessage"]
     </div>
 }
+
+<div class="form-container">
+    <div class="form-section">
+        <h2>Pending Claims</h2>
+        <p>Claims found: @(Model?.Count() ?? 0)</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Claim Number</th>
+                        <th>Lecturer Number</th>
+                        <th>Submission Date</th>
+                        <th>Hours Worked</th>
+                        <th>Hourly Rate</th>
+                        <th>Total Amount</th>
+                        <th>Comments</th>
+                        <th>File Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.Any() == true)
+                    {
+                        foreach (var claim in Model)
+                        {
+                            <tr>
+                                <td>@claim.ClaimNum</td>
+                                <td>@claim.LecturerNum</td>
+                                <td>@claim.SubmissionDate.ToString("yyyy-MM-dd")</td>
+                                <td>@claim.HoursWorked</td>
+                                <td>@($"R{claim.HourlyRate:F2}")</td>
+                                <td>@($"R{claim.TotalAmount:F2}")</td>
+                                <td class="notes-cell" title="@claim.Comments">@claim.Comments</td>
+                                <td>@(string.IsNullOrEmpty(claim.Filename) ? "No file" : claim.Filename)</td>
+                                <td class="action-buttons">
+                                    <form method="post" action="@Url.Action("ApproveClaim", "Home", new { id = claim.ClaimID })" style="display: inline;">
+                                        <button type="submit" class="accept-btn">Approve</button>
+                                    </form>
+                                    <form method="post" action="@Url.Action("RejectClaim", "Home", new { id = claim.ClaimID })" style="display: inline;">
+                                        <button type="submit" class="reject-btn">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="no-claims-message">No pending claims to display.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

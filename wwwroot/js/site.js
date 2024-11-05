@@ -1,14 +1,11 @@
-﻿// Wait for the document to be ready
+﻿
 $(document).ready(function () {
     // Cache DOM elements
     const $hoursWorked = $('input[name="hoursWorked"]');
     const $hourlyRate = $('input[name="hourlyRate"]');
     const $form = $('form');
     const $fileInput = $('input[type="file"]');
-
-    // Add a new element to display total amount
-    const $totalAmountDisplay = $('<div class="total-amount-display" style="margin: 15px 0; padding: 10px; background-color: #e9ecef; border-radius: 4px;"></div>');
-    $hourlyRate.after($totalAmountDisplay);
+    const $totalAmountDisplay = $('.total-amount-display');
 
     // Function to calculate and display total amount
     function calculateTotal() {
@@ -43,49 +40,29 @@ $(document).ready(function () {
 
     // Add input event listeners for real-time calculation
     $hoursWorked.on('input', function () {
-        const hours = parseFloat($(this).val());
-        if (!validateHours(hours)) {
-            $(this).addClass('is-invalid');
-            if (hours > 160) {
-                $(this).after('<div class="invalid-feedback">Hours cannot exceed 160 per month</div>');
-            } else {
-                $(this).after('<div class="invalid-feedback">Please enter valid hours worked</div>');
-            }
-        } else {
-            $(this).removeClass('is-invalid');
-            $('.invalid-feedback').remove();
-        }
         calculateTotal();
     });
 
     $hourlyRate.on('input', function () {
-        const rate = parseFloat($(this).val());
-        if (!validateRate(rate)) {
-            $(this).addClass('is-invalid');
-            if (rate > 1000) {
-                $(this).after('<div class="invalid-feedback">Hourly rate cannot exceed R1000</div>');
-            } else {
-                $(this).after('<div class="invalid-feedback">Please enter a valid hourly rate</div>');
-            }
-        } else {
-            $(this).removeClass('is-invalid');
-            $('.invalid-feedback').remove();
-        }
         calculateTotal();
     });
 
     // File input validation
     $fileInput.on('change', function () {
+        const $existingError = $(this).next('.invalid-feedback');
+
         if (!validateFileSize()) {
             $(this).addClass('is-invalid');
-            $(this).after('<div class="invalid-feedback">File size must not exceed 5MB</div>');
+            if ($existingError.length === 0) {
+                $(this).after('<div class="invalid-feedback">File size must not exceed 5MB</div>');
+            }
         } else {
             $(this).removeClass('is-invalid');
             $('.invalid-feedback').remove();
         }
     });
 
-    // Form submission handling
+    // This section handles the submission of the claim form
     $form.on('submit', function (e) {
         const hours = parseFloat($hoursWorked.val());
         const rate = parseFloat($hourlyRate.val());

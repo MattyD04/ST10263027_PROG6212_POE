@@ -17,10 +17,14 @@ namespace ST10263027_PROG6212_POE.Models
         public DateTime SubmissionDate { get; set; } // attribute to store the submission date
         [Required]
         public string ClaimStatus { get; set; } // attribute to store the status of a claim (which will be accepted, rejected or pending)
+        [Required] 
         public string Filename { get; set; } // attribute to store the name of a file
+        [Required] 
         public string ContentType { get; set; } // attribute to store the content of a file
+        [Required] 
         public byte[] FileData { get; set; } // attribute to store the data of a file
-        public string Comments { get; set; } // attribute to store the comments submitted by a lecturer
+        [Required]
+        public string Comments { get; set; } = "None"; // attribute to store the comments submitted by a lecturer
 
         [ForeignKey("LecturerID")]
         public virtual Lecturer Lecturer { get; set; } // creates a foreign key reference to the lecturer table

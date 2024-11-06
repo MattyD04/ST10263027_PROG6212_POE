@@ -18,10 +18,10 @@
     }
 
     function validateHours(hours) {
-        return hours > 0; // Only checking that hours is positive
+        return hours > 0; //Checks that hours is positive
     }
     function validateRate(rate) {
-        return rate > 0; // Only checking that rate is positive
+        return rate > 0; //Checks that rate is positive
     }
     function validateFileSize() {
         //function to validate the size of a file

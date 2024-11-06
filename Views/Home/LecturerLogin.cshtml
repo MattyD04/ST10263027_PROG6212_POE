@@ -93,20 +93,14 @@
 
 <div class="form-container">
     <div class="form-section">
-        <h1>Login</h1>
+        <h1>Lecturer Login</h1>
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="error-message">
                 @TempData["ErrorMessage"]
             </div>
         }
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="success-message">
-                @TempData["SuccessMessage"]
-            </div>
-        }
-        <form asp-controller="Login" asp-action="Login" method="post">
+        <form asp-action="Login" asp-controller="Login" method="post">
             <p>Please enter your login details:</p>
             <input type="text" name="username" placeholder="Lecturer Number" required />
             <input type="password" name="password" placeholder="Password" required />

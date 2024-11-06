@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ST10263027_PROG6212_POE.Data;
 using System;
@@ -8,8 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 //--------------------------
+// Configure Entity Framework and connect to SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configure ASP.NET Identity for user authentication and authorization
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 //--------------------------
 
@@ -28,6 +35,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Enable authentication and authorization middleware for ASP.NET Identity
+app.UseAuthentication(); // Required for Identity authentication
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -35,4 +44,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-//-----------------------------------End of file--------------------------------------------//
+//***************************************************End of file**************************************************//

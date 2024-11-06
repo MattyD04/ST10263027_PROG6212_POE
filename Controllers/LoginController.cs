@@ -1,17 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using ST10263027_PROG6212_POE.Data;
 using ST10263027_PROG6212_POE.Models;
+using System.Threading.Tasks;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public LoginController(AppDbContext context)
+        public LoginController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
         {
-            _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -38,117 +41,129 @@ namespace ST10263027_PROG6212_POE.Controllers
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 TempData["ErrorMessage"] = "Please enter both Username and Password."; //displays if fields are empty
-                return View("~/Views/Home/LecturerLogin.cshtml");
+                return RedirectToAction(isManager ? "HandleManagerLogin" : isCoordinator ? "HandleCoordinatorLogin" : "Login");
             }
 
-            if (isManager)
+            var result = await _signInManager.PasswordSignInAsync(username, password, isPersistent: false, lockoutOnFailure: false);
+
+            if (result.Succeeded)
             {
-                return await HandleManagerLogin(username, password);
+                // Redirect based on role if needed
+                if (isManager)
+                {
+                    return RedirectToAction("VerifyClaims", "Home");
+                }
+                else if (isCoordinator)
+                {
+                    return RedirectToAction("VerifyClaims", "Home");
+                }
+                else
+                {
+                    return RedirectToAction("Privacy", "Home");
+                }
             }
-            else if (isCoordinator)
-            {
-                return await HandleCoordinatorLogin(username, password);
-            }
-            else
-            {
-                return await HandleLecturerLogin(username, password);
-            }
+
+            TempData["ErrorMessage"] = "Invalid login attempt.";
+            return RedirectToAction(isManager ? "HandleManagerLogin" : isCoordinator ? "HandleCoordinatorLogin" : "Login");
         }
 
         //****************************************************************************************************************************//
         private async Task<IActionResult> HandleManagerLogin(string username, string password) //method to handle the login of an Academic Manager
         {
-            var academicManager = await _context.AcademicManagers
-                .FirstOrDefaultAsync(am => am.ManagerNum == username);
-
-            if (academicManager == null)
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
             {
-                academicManager = new AcademicManager //if manager is signing in for the first time, this creates a new manager
+                user = new IdentityUser { UserName = username };
+                var result = await _userManager.CreateAsync(user, password);
+
+                if (result.Succeeded)
                 {
-                    ManagerNum = username,
-                    Password = password
-                };
-
-                _context.AcademicManagers.Add(academicManager);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Academic Manager account created successfully. Please log in."; //displays if manager logged in correctly
-                return View("~/Views/Home/AcademicManagerLogin.cshtml"); //directs to the Academic Manager view
+                    await _userManager.AddToRoleAsync(user, "AcademicManager");
+                    TempData["SuccessMessage"] = "Academic Manager account created successfully. Please log in.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to create account.";
+                    return View("~/Views/Home/AcademicManagerLogin.cshtml");
+                }
             }
-            else if (academicManager.Password != password)
+            else if (!await _userManager.CheckPasswordAsync(user, password))
             {
-                TempData["ErrorMessage"] = "Invalid password."; //displays if the stored password does not match
+                TempData["ErrorMessage"] = "Invalid password."; //displays if password does not match
                 return View("~/Views/Home/AcademicManagerLogin.cshtml");
             }
 
-            // Successful login
-            return RedirectToAction("VerifyClaims", "Home"); //redirects to the relevant page after a successful login
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("VerifyClaims", "Home"); //redirects after a successful login
         }
 
         //****************************************************************************************************************************//
-        [HttpPost]
-        public async Task<IActionResult> HandleCoordinatorLogin(string username, string password) //method to handle the login of a programme coordinator
+        private async Task<IActionResult> HandleCoordinatorLogin(string username, string password) //method to handle the login of a Programme Coordinator
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
             {
-                TempData["ErrorMessage"] = "Please enter both Username and Password."; //displays if fields are empty
-                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml"); //redirects back to the login page
-            }
+                user = new IdentityUser { UserName = username };
+                var result = await _userManager.CreateAsync(user, password);
 
-            var coordinator = await _context.ProgrammeCoordinators
-                .FirstOrDefaultAsync(pc => pc.CoordinatorNum == username);
-
-            if (coordinator == null)
-            {
-                coordinator = new ProgrammeCoordinator //if a Coordinator is signing in for the first time, this creates a new Coordinator
+                if (result.Succeeded)
                 {
-                    CoordinatorNum = username,
-                    Password = password
-                };
-
-                _context.ProgrammeCoordinators.Add(coordinator);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Programme Coordinator account created successfully."; //message displays if successfully logged in
+                    await _userManager.AddToRoleAsync(user, "ProgrammeCoordinator");
+                    TempData["SuccessMessage"] = "Programme Coordinator account created successfully.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to create account.";
+                    return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
+                }
             }
-            else if (coordinator.Password != password)
+            else if (!await _userManager.CheckPasswordAsync(user, password))
             {
-                TempData["ErrorMessage"] = "Invalid password."; //displays if the password does not match
-                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml"); //redirects back to the login page for retry
+                TempData["ErrorMessage"] = "Invalid password."; //displays if password does not match
+                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
             }
 
-            return RedirectToAction("VerifyClaims", "Home"); //redirects to the Verify Claims form after successful login
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("VerifyClaims", "Home"); //redirects to Verify Claims after successful login
         }
 
         //****************************************************************************************************************************//
         private async Task<IActionResult> HandleLecturerLogin(string username, string password) //method to handle the login for the lecturer
         {
-            var lecturer = await _context.Lecturers
-                .FirstOrDefaultAsync(l => l.LecturerNum == username);
-
-            if (lecturer == null)
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
             {
-                lecturer = new Lecturer //if a lecturer is signing in for the first time, this creates a new lecturer
+                user = new IdentityUser { UserName = username };
+                var result = await _userManager.CreateAsync(user, password);
+
+                if (result.Succeeded)
                 {
-                    LecturerNum = username,
-                    Password = password
-                };
-
-                _context.Lecturers.Add(lecturer);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Lecturer account created successfully."; //displays if successfully logged in
+                    await _userManager.AddToRoleAsync(user, "Lecturer");
+                    TempData["SuccessMessage"] = "Lecturer account created successfully.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to create account.";
+                    return View("~/Views/Home/LecturerLogin.cshtml");
+                }
             }
-            else if (lecturer.Password != password)
+            else if (!await _userManager.CheckPasswordAsync(user, password))
             {
-                TempData["ErrorMessage"] = "Invalid password."; //displays if the password does not match
-                return View("~/Views/Home/LecturerLogin.cshtml"); //returns back to the login view for retry
+                TempData["ErrorMessage"] = "Invalid password."; //displays if password does not match
+                return View("~/Views/Home/LecturerLogin.cshtml");
             }
 
-            return RedirectToAction("Privacy", "Home"); //redirects to the claims submission form upon successful login
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("Privacy", "Home"); //redirects to claims submission upon successful login
         }
 
         //****************************************************************************************************************************//
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
         public IActionResult Index()
         {
             return View("~/Views/Home/Index.cshtml");

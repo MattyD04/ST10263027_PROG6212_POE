@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
-    [Authorize(Roles = "ProgrammeCoordinator,AcademicManager")] // Allows both Programme Coordinators and Academic Managers to access the specified actions
+     
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

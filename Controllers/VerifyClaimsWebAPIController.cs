@@ -17,7 +17,6 @@ namespace ST10263027_PROG6212_POE.Controllers
             _context = context;
         }
 
-        // GET: api/VerifyClaimsWebAPI/GetPendingClaims
         [HttpGet("GetPendingClaims")]
         public async Task<ActionResult<IEnumerable<ClaimViewModel>>> GetPendingClaims()
         {
@@ -29,16 +28,17 @@ namespace ST10263027_PROG6212_POE.Controllers
                     .Select(c => new ClaimViewModel
                     {
                         ClaimID = c.ClaimID,
-                        ClaimNum = c.ClaimNum,
-                        LecturerNum = c.Lecturer.LecturerNum,
+                        ClaimNum = c.ClaimNum ?? "",
+                        LecturerNum = c.Lecturer.LecturerNum ?? "",
                         SubmissionDate = c.SubmissionDate,
                         HoursWorked = c.Lecturer.HoursWorked,
                         HourlyRate = c.Lecturer.HourlyRate,
                         TotalAmount = c.Lecturer.HoursWorked * c.Lecturer.HourlyRate,
-                        Comments = c.Comments,
-                        Filename = c.Filename
+                        Comments = c.Comments ?? "",
+                        Filename = c.Filename ?? ""
                     })
                     .ToListAsync();
+
                 return Ok(claims);
             }
             catch (Exception ex)
@@ -47,7 +47,6 @@ namespace ST10263027_PROG6212_POE.Controllers
             }
         }
 
-        // PUT: api/VerifyClaimsWebAPI/ApproveClaim/5
         [HttpPut("ApproveClaim/{id}")]
         public async Task<IActionResult> ApproveClaim(int id)
         {
@@ -58,8 +57,10 @@ namespace ST10263027_PROG6212_POE.Controllers
                 {
                     return NotFound(new { message = "Claim not found" });
                 }
+
                 claim.ClaimStatus = "Approved";
                 await _context.SaveChangesAsync();
+
                 return Ok(new { message = "Claim approved successfully" });
             }
             catch (Exception ex)
@@ -68,7 +69,6 @@ namespace ST10263027_PROG6212_POE.Controllers
             }
         }
 
-        // PUT: api/VerifyClaimsWebAPI/RejectClaim/5
         [HttpPut("RejectClaim/{id}")]
         public async Task<IActionResult> RejectClaim(int id)
         {
@@ -79,8 +79,10 @@ namespace ST10263027_PROG6212_POE.Controllers
                 {
                     return NotFound(new { message = "Claim not found" });
                 }
+
                 claim.ClaimStatus = "Rejected";
                 await _context.SaveChangesAsync();
+
                 return Ok(new { message = "Claim rejected successfully" });
             }
             catch (Exception ex)

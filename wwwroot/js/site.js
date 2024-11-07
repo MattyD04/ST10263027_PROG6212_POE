@@ -84,42 +84,134 @@
             e.preventDefault(); // Prevent form submission if validation fails, aiding in error handling 
         }
     });
-   
-    function initializeClaimsPage() {
-        if (document.querySelector('.claims-table')) {
-            loadPendingClaims();
+    // Claim Submission Form Functionality
+    $(document).ready(function () {
+        initializeClaimForm();
+        initializeClaimsVerificationPage();
+    });
+
+    // Claim Form Functions
+    function initializeClaimForm() {
+        // Cache DOM elements
+        const $hoursWorked = $('input[name="hoursWorked"]');
+        const $hourlyRate = $('input[name="hourlyRate"]');
+        const $form = $('form');
+        const $fileInput = $('input[type="file"]');
+        const $totalAmountDisplay = $('.total-amount-display');
+
+        // Calculate and display total amount
+        function calculateTotal() {
+            const hours = parseFloat($hoursWorked.val()) || 0;
+            const rate = parseFloat($hourlyRate.val()) || 0;
+            const total = (hours * rate).toFixed(2);
+            if (hours && rate) {
+                $totalAmountDisplay.html(`<strong>Total Amount: R${total}</strong>`);
+            } else {
+                $totalAmountDisplay.html('<span style="color: #6c757d;">Enter hours and rate to see total</span>');
+            }
         }
+
+        // Validation functions
+        function validateHours(hours) {
+            return hours > 0;
+        }
+
+        function validateRate(rate) {
+            return rate > 0;
+        }
+
+        function validateFileSize() {
+            const fileInput = $fileInput[0];
+            if (fileInput.files.length > 0) {
+                const fileSize = fileInput.files[0].size / 1024 / 1024; // Convert to MB
+                return fileSize <= 5;
+            }
+            return true;
+        }
+
+        // Event listeners
+        $hoursWorked.on('input', calculateTotal);
+        $hourlyRate.on('input', calculateTotal);
+
+        $fileInput.on('change', function () {
+            const $existingError = $(this).next('.invalid-feedback');
+            if (!validateFileSize()) {
+                $(this).addClass('is-invalid');
+                if ($existingError.length === 0) {
+                    $(this).after('<div class="invalid-feedback">File size must not exceed 5MB</div>');
+                }
+            } else {
+                $(this).removeClass('is-invalid');
+                $('.invalid-feedback').remove();
+            }
+        });
+
+        $form.on('submit', function (e) {
+            const hours = parseFloat($hoursWorked.val());
+            const rate = parseFloat($hourlyRate.val());
+
+            $('.invalid-feedback').remove();
+            $('.is-invalid').removeClass('is-invalid');
+
+            let isValid = true;
+
+            if (!validateHours(hours)) {
+                $hoursWorked.addClass('is-invalid');
+                $hoursWorked.after('<div class="invalid-feedback">Please enter a positive number of hours</div>');
+                isValid = false;
+            }
+
+            if (!validateRate(rate)) {
+                $hourlyRate.addClass('is-invalid');
+                $hourlyRate.after('<div class="invalid-feedback">Please enter a positive rate</div>');
+                isValid = false;
+            }
+
+            if (!validateFileSize()) {
+                $fileInput.addClass('is-invalid');
+                $fileInput.after('<div class="invalid-feedback">File size must not exceed 5MB</div>');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Claims Verification Page Functions
+    function initializeClaimsVerificationPage() {
+        if (!document.querySelector('.claims-table')) return;
+
+        loadPendingClaims();
     }
 
     function loadPendingClaims() {
-        fetch('/api/ClaimsWebApi/GetPendingClaims')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(claims => {
+        $.ajax({
+            url: '/api/VerifyClaimsWebAPI/GetPendingClaims',
+            method: 'GET',
+            success: function (claims) {
                 updateClaimsTable(claims);
                 updateClaimsCount(claims.length);
-            })
-            .catch(error => {
+            },
+            error: function (xhr, status, error) {
                 console.error('Error loading claims:', error);
                 showAlert('Error loading claims. Please try again.', 'danger');
-            });
+            }
+        });
     }
 
     function updateClaimsTable(claims) {
-        const tableBody = document.querySelector('.claims-table tbody');
-        if (!tableBody) return;
+        const $tableBody = $('.claims-table tbody');
+        if (!$tableBody.length) return;
 
-        tableBody.innerHTML = '';
+        $tableBody.empty();
 
         if (claims.length === 0) {
-            tableBody.innerHTML = `
+            $tableBody.html(`
             <tr>
                 <td colspan="9" class="no-claims-message">No pending claims to display.</td>
-            </tr>`;
+            </tr>`);
             return;
         }
 
@@ -139,15 +231,12 @@
                     <button onclick="handleClaimAction(${claim.claimID}, 'Reject')" class="reject-btn">Reject</button>
                 </td>
             </tr>`;
-            tableBody.insertAdjacentHTML('beforeend', row);
+            $tableBody.append(row);
         });
     }
 
     function updateClaimsCount(count) {
-        const countElement = document.querySelector('.claims-count');
-        if (countElement) {
-            countElement.textContent = `Claims found: ${count}`;
-        }
+        $('.claims-count').text(`Claims found: ${count}`);
     }
 
     function handleClaimAction(claimId, action) {
@@ -155,39 +244,29 @@
             return;
         }
 
-        fetch(`/api/ClaimsWebApi/${action}Claim/${claimId}`, {
+        $.ajax({
+            url: `/api/VerifyClaimsWebAPI/${action}Claim/${claimId}`,
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
+            contentType: 'application/json',
+            success: function (data) {
                 showAlert(data.message, 'success');
-                loadPendingClaims(); // Reload the claims list
-            })
-            .catch(error => {
+                loadPendingClaims();
+            },
+            error: function (xhr, status, error) {
                 console.error(`Error ${action.toLowerCase()}ing claim:`, error);
                 showAlert(`Error ${action.toLowerCase()}ing claim. Please try again.`, 'danger');
-            });
+            }
+        });
     }
 
     function showAlert(message, type) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type}`;
-        alertDiv.textContent = message;
+        const $alertDiv = $(`<div class="alert alert-${type}">${message}</div>`);
+        const $container = $('.form-container');
 
-        const container = document.querySelector('.form-container');
-        if (container) {
-            container.insertBefore(alertDiv, container.firstChild);
-            setTimeout(() => alertDiv.remove(), 5000);
+        if ($container.length) {
+            $container.prepend($alertDiv);
+            setTimeout(() => $alertDiv.remove(), 5000);
         }
     }
-
-    document.addEventListener('DOMContentLoaded', initializeClaimsPage);
-});
+}); 
+   

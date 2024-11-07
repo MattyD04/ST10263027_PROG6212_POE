@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ST10263027_PROG6212_POE.Data;
+using FluentValidation.AspNetCore; // Ensure you have this namespace for FluentValidation
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,13 @@ builder.Services.AddControllersWithViews();
 // Configure Entity Framework and connect to SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register FluentValidation services
+builder.Services.AddControllersWithViews()
+    .AddFluentValidation(options =>
+    {
+        options.RegisterValidatorsFromAssemblyContaining<ClaimViewModelValidator>();
+    });
 
 var app = builder.Build();
 

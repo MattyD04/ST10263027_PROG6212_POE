@@ -155,6 +155,7 @@
 
 <div class="form-container">
     <div class="form-section">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <h2>Pending Claims</h2>
         <p class="claims-count">Claims found: @(Model?.Count() ?? 0)</p>
 

@@ -56,7 +56,7 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
 
         //***************************************************************************************//
-        public IActionResult VerifyClaims() // Method to handle the verification of claims by passing the information of the claim to the table in the Verify Claims page
+        public IActionResult VerifyClaims()
         {
             var claimViewModels = _context.Claims
                 .Where(claim => claim.ClaimStatus == "Pending")
@@ -74,8 +74,25 @@ namespace ST10263027_PROG6212_POE.Controllers
                 })
                 .ToList();
 
+            var validator = new ClaimViewModelValidator();
+            var validationResults = claimViewModels.Select(model => validator.Validate(model));
+
+            // Iterate through validation results
+            foreach (var result in validationResults)
+            {
+                if (!result.IsValid)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                    }
+                }
+            }
+
+            // Return view after all validations are processed
             return View(claimViewModels);
         }
+
         //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> ApproveClaim(int id) // Method for handling the approval of a claim

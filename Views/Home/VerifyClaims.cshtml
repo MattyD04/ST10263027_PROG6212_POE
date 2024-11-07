@@ -4,7 +4,7 @@
 }
 <!-- Code correction and changes done by Claude AI to fix error with displaying of information in table and <fixing
     error in JS section causing claims to not be approved or rejected and not working with the web api file -->
-       
+
 <style>
     body {
         background: linear-gradient(skyblue, red);
@@ -204,6 +204,7 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script>
         function showAlert(message, type) {
@@ -237,29 +238,29 @@
 
             if (claims.length === 0) {
                 tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="9" class="no-claims-message">No pending claims to display.</td>
-                            </tr>`;
+                                            <tr>
+                                                <td colspan="9" class="no-claims-message">No pending claims to display.</td>
+                                            </tr>`;
                 return;
             }
 
             claims.forEach(claim => {
                 const submissionDate = new Date(claim.submissionDate).toLocaleDateString('en-ZA');
                 const row = `
-                            <tr>
-                                <td>${claim.claimNum}</td>
-                                <td>${claim.lecturerNum}</td>
-                                <td>${submissionDate}</td>
-                                <td>${Number(claim.hoursWorked).toFixed(2)}</td>
-                                <td>R${Number(claim.hourlyRate).toFixed(2)}</td>
-                                <td>R${Number(claim.totalAmount).toFixed(2)}</td>
-                                <td class="notes-cell" title="${claim.comments}">${claim.comments}</td>
-                                <td>${claim.filename || 'No file'}</td>
-                                <td class="action-buttons">
-                                    <button onclick="handleClaimAction(${claim.claimID}, 'Approve')" class="accept-btn">Approve</button>
-                                    <button onclick="handleClaimAction(${claim.claimID}, 'Reject')" class="reject-btn">Reject</button>
-                                </td>
-                            </tr>`;
+                                            <tr>
+                                                <td>${claim.claimNum}</td>
+                                                <td>${claim.lecturerNum}</td>
+                                                <td>${submissionDate}</td>
+                                                <td>${Number(claim.hoursWorked).toFixed(2)}</td>
+                                                <td>R${Number(claim.hourlyRate).toFixed(2)}</td>
+                                                <td>R${Number(claim.totalAmount).toFixed(2)}</td>
+                                                <td class="notes-cell" title="${claim.comments}">${claim.comments}</td>
+                                                <td>${claim.filename || 'No file'}</td>
+                                                <td class="action-buttons">
+                                                    <button onclick="handleClaimAction(${claim.claimID}, 'Approve')" class="accept-btn">Approve</button>
+                                                    <button onclick="handleClaimAction(${claim.claimID}, 'Reject')" class="reject-btn">Reject</button>
+                                                </td>
+                                            </tr>`;
                 tableBody.insertAdjacentHTML('beforeend', row);
             });
         }
@@ -274,23 +275,20 @@
             const buttons = currentRow.querySelectorAll('button');
             buttons.forEach(button => button.disabled = true);
 
-            fetch(`/api/VerifyClaimsWebAPI/${action}Claim/${claimId}`, {
-                method: 'PUT',
+            fetch(`/Home/${action}Claim?id=${claimId}`, {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 }
             })
                 .then(response => {
-                    if (!response.ok) {
+                    if (response.ok) {
+                        showAlert(`Claim has been ${action.toLowerCase()}d successfully.`, 'success');
+                        // Wait a brief moment before refreshing the claims list
+                        setTimeout(loadPendingClaims, 500);
+                    } else {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    showAlert(data.message, 'success');
-                    // Wait a brief moment before refreshing the claims list
-                    setTimeout(loadPendingClaims, 500);
                 })
                 .catch(error => {
                     console.error(`Error ${action.toLowerCase()}ing claim:`, error);
@@ -300,11 +298,14 @@
         }
 
         function loadPendingClaims() {
-            fetch("/api/VerifyClaimsWebAPI/GetPendingClaims")
-                .then(response => response.json())
+            fetch("/Home/VerifyClaims")
+                .then(response => response.text())
                 .then(data => {
-                    updateClaimsCount(data.length);
-                    updateClaimsTable(data);
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const claims = JSON.parse(doc.querySelector('#claimsData').textContent);
+                    updateClaimsCount(claims.length);
+                    updateClaimsTable(claims);
                 })
                 .catch(error => console.error("Error fetching claims:", error));
         }

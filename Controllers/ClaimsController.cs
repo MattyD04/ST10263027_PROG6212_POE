@@ -30,7 +30,7 @@ namespace ST10263027_PROG6212_POE.Controllers
      string additionalNotes,
      IFormFile file)
         {
-            // Checks if the model state is valid
+            // Checks to see if the model state is valid
             if (ModelState.IsValid)
             {
                 // Validates file size if file exists
@@ -63,21 +63,11 @@ namespace ST10263027_PROG6212_POE.Controllers
                     Password = "default_password" // Assigns a default password (for error handling)
                 };
 
-                // Add lecturer to the database if not already present
-                var existingLecturer = await _context.Lecturers
-                    .FirstOrDefaultAsync(l => l.LecturerNum == lecturer_number);
+                // Add lecturer to the database
+                _context.Lecturers.Add(lecturer);
+                await _context.SaveChangesAsync();
 
-                if (existingLecturer == null)
-                {
-                    _context.Lecturers.Add(lecturer);
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    lecturer = existingLecturer; // Use existing lecturer if found
-                }
-
-                // Creates a Claim object
+                // Creates a Claim object if it does not exist
                 var claim = new Claim
                 {
                     ClaimNum = claim_number,
@@ -100,9 +90,8 @@ namespace ST10263027_PROG6212_POE.Controllers
                 }
                 else
                 {
-                    // If no file is uploaded, set an empty byte array for FileData
-                    claim.FileData = new byte[0]; // Empty byte array to avoid null insertion
-                    claim.ContentType = "application/octet-stream"; // Default content type for no file
+                    // If no file is uploaded, set a default value for ContentType
+                    claim.ContentType = "application/octet-stream";  // Default binary stream type
                 }
 
                 // Add claim to the database
@@ -118,7 +107,6 @@ namespace ST10263027_PROG6212_POE.Controllers
             // If model state is not valid, return to the form
             return View();
         }
-
 
 
     }

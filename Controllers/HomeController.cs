@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -35,53 +36,82 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
 
-        //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> TrackClaim(string claim_number)
         {
             if (string.IsNullOrEmpty(claim_number))
             {
-                TempData["ErrorMessage"] = "Claim Number is required."; // If a user tries to track a claim without inputting the number
+                TempData["ErrorMessage"] = "Claim Number is required.";
                 return View("TrackClaims");
             }
             var claim = await _context.Claims
                 .FirstOrDefaultAsync(c => c.ClaimNum == claim_number);
             if (claim == null)
             {
-                TempData["ErrorMessage"] = "Claim not found for the provided claim number."; // If a user enters an invalid claim number
+                TempData["ErrorMessage"] = "Claim not found for the provided claim number.";
                 return View("TrackClaims");
             }
             ViewBag.ClaimStatus = claim.ClaimStatus;
             return View("TrackClaims");
         }
 
-        //***************************************************************************************//
         public IActionResult VerifyClaims()
         {
             var claimViewModels = _context.Claims
                 .Where(claim => claim.ClaimStatus == "Pending")
                 .Select(claim => new ClaimViewModel
                 {
-                    ClaimID = claim.ClaimID, // Fetches the ClaimID
-                    ClaimNum = claim.ClaimNum, // Fetches the Claim Number
-                    LecturerNum = claim.Lecturer.LecturerNum, // Fetches the Lecturer Number
-                    SubmissionDate = claim.SubmissionDate, // Fetches the submission date of the claim
-                    HoursWorked = claim.Lecturer.HoursWorked, // Fetches the lecturer's hours worked
-                    HourlyRate = claim.Lecturer.HourlyRate, // Fetches the lecturer's hourly rate
-                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate, // Calculates the total amount of the contract
-                    Comments = claim.Comments, // Fetches the comments submitted by the lecturer
-                    Filename = claim.Filename // Fetches the name of the file submitted by the lecturer
+                    ClaimID = claim.ClaimID,
+                    ClaimNum = claim.ClaimNum,
+                    LecturerNum = claim.Lecturer.LecturerNum,
+                    SubmissionDate = claim.SubmissionDate,
+                    HoursWorked = claim.Lecturer.HoursWorked,
+                    HourlyRate = claim.Lecturer.HourlyRate,
+                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
+                    Comments = claim.Comments,
+                    Filename = claim.Filename
                 })
                 .ToList();
 
-            
-
-            return View(claimViewModels); // Return the view after all validations
+            return View(claimViewModels);
         }
 
-        //***************************************************************************************//
-       
-        
+        [HttpPost]
+        public async Task<IActionResult> ApproveClaim(int id)
+        {
+            var claim = await _context.Claims.FindAsync(id);
+            if (claim != null)
+            {
+                claim.ClaimStatus = "Approved";
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Claim has been approved successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Claim not found.";
+            }
+
+            return RedirectToAction(nameof(VerifyClaims));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectClaim(int id)
+        {
+            var claim = await _context.Claims.FindAsync(id);
+            if (claim != null)
+            {
+                claim.ClaimStatus = "Rejected";
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Claim has been rejected successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Claim not found.";
+            }
+
+            return RedirectToAction(nameof(VerifyClaims));
+        }
+
         public IActionResult LecturerLogin()
         {
             return View();

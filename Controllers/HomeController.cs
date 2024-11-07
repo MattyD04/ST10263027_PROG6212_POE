@@ -36,6 +36,26 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
         //***************************************************************************************//
+        [HttpPost]
+        public async Task<IActionResult> TrackClaim(string claim_number)
+        {
+            if (string.IsNullOrEmpty(claim_number))
+            {
+                TempData["ErrorMessage"] = "Claim Number is required."; //if a user tries to track a claim without inputting the number then this message displays
+                return View("TrackClaims"); 
+            }
+            var claim = await _context.Claims
+                .FirstOrDefaultAsync(c => c.ClaimNum == claim_number);
+            if (claim == null)
+            {
+                TempData["ErrorMessage"] = "Claim not found for the provided claim number."; //if a user enters an invalid claim number then this message displays
+                return View("TrackClaims"); 
+            }
+            ViewBag.ClaimStatus = claim.ClaimStatus;
+            return View("TrackClaims"); 
+        }
+
+        //***************************************************************************************//
         public IActionResult VerifyClaims() // Method to handle the verification of claims by passing the information of the claim to the table in the Verify Claims page
         {
             var claimViewModels = _context.Claims

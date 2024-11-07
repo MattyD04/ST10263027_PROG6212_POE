@@ -205,4 +205,102 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        function initializeClaimsPage() {
+            if (document.querySelector('.claims-table')) {
+                loadPendingClaims();
+            }
+        }
+        function loadPendingClaims() {
+            fetch('/api/VerifyClaimsWebAPI/GetPendingClaims')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(claims => {
+                    updateClaimsTable(claims);
+                    updateClaimsCount(claims.length);
+                })
+                .catch(error => {
+                    console.error('Error loading claims:', error);
+                    showAlert('Error loading claims. Please try again.', 'danger');
+                });
+        }
+        function updateClaimsTable(claims) {
+            const tableBody = document.querySelector('.claims-table tbody');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            if (claims.length === 0) {
+                tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="9" class="no-claims-message">No pending claims to display.</td>
+                            </tr>`;
+                return;
+            }
+            claims.forEach(claim => {
+                const row = `
+                            <tr>
+                                <td>${claim.claimNum}</td>
+                                <td>${claim.lecturerNum}</td>
+                                <td>${new Date(claim.submissionDate).toLocaleDateString()}</td>
+                                <td>${claim.hoursWorked}</td>
+                                <td>R${claim.hourlyRate.toFixed(2)}</td>
+                                <td>R${claim.totalAmount.toFixed(2)}</td>
+                                <td class="notes-cell" title="${claim.comments}">${claim.comments}</td>
+                                <td>${claim.filename || 'No file'}</td>
+                                <td class="action-buttons">
+                                    <button onclick="handleClaimAction(${claim.claimID}, 'Approve')" class="accept-btn">Approve</button>
+                                    <button onclick="handleClaimAction(${claim.claimID}, 'Reject')" class="reject-btn">Reject</button>
+                                </td>
+                            </tr>`;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+        function updateClaimsCount(count) {
+            const countElement = document.querySelector('.claims-count');
+            if (countElement) {
+                countElement.textContent = `Claims found: ${count}`;
+            }
+        }
+        function handleClaimAction(claimId, action) {
+            if (!confirm(`Are you sure you want to ${action.toLowerCase()} this claim?`)) {
+                return;
+            }
+            fetch(`/api/VerifyClaimsWebAPI/${action}Claim/${claimId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showAlert(data.message, 'success');
+                    loadPendingClaims();
+                })
+                .catch(error => {
+                    console.error(`Error ${action.toLowerCase()}ing claim:`, error);
+                    showAlert(`Error ${action.toLowerCase()}ing claim. Please try again.`, 'danger');
+                });
+        }
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            const container = document.querySelector('.form-container');
+            if (container) {
+                container.insertBefore(alertDiv, container.firstChild);
+                setTimeout(() => alertDiv.remove(), 5000);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', initializeClaimsPage);
+    </script>
+}
 

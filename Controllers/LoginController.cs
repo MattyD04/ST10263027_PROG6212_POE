@@ -16,13 +16,13 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View();
         }
-        // GET: Login
+        
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
-        // POST: Login
+        
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password, bool isManager = false, bool isCoordinator = false)
         {
@@ -44,6 +44,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                 return await HandleLecturerLogin(username, password);
             }
         }
+        //***************************************************************************************//
         private async Task<IActionResult> HandleManagerLogin(string username, string password)
         {
             // Handle login for Academic Manager
@@ -70,7 +71,7 @@ namespace ST10263027_PROG6212_POE.Controllers
             // Redirect to VerifyClaims for Academic Manager
             return RedirectToAction("VerifyClaims", "Home");
         }
-        // POST: ProgrammeCoordinatorLogin
+        //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> HandleCoordinatorLogin(string username, string password)
         {
@@ -103,6 +104,7 @@ namespace ST10263027_PROG6212_POE.Controllers
             // Redirect to VerifyClaims for Programme Coordinator
             return RedirectToAction("VerifyClaims", "Home");
         }
+        //***************************************************************************************//
         private async Task<IActionResult> HandleLecturerLogin(string username, string password)
         {
             // Handle login for Lecturer
@@ -127,9 +129,11 @@ namespace ST10263027_PROG6212_POE.Controllers
             // Redirect to Privacy for Lecturer
             return RedirectToAction("Privacy", "Home");
         }
+        //***************************************************************************************//
         public IActionResult Index()
         {
             return View();
         }
     }
+    //***********************************End of file*************************************************//
 }

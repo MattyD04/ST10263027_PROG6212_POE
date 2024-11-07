@@ -35,7 +35,7 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View();
         }
-
+        //***************************************************************************************//
         public IActionResult VerifyClaims() // Method to handle the verification of claims by passing the information of the claim to the table in the Verify Claims page
         {
             var claimViewModels = _context.Claims
@@ -56,7 +56,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return View(claimViewModels);
         }
-
+        //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> ApproveClaim(int id) // Method for handling the approval of a claim
         {
@@ -74,7 +74,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction(nameof(VerifyClaims)); // Redirects to the Verify Claims page so a Coordinator or Manager can approve or reject more claims
         }
-
+        //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> RejectClaim(int id) // Method for handling the rejection of a claim
         {
@@ -92,7 +92,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction(nameof(VerifyClaims)); // Redirects to the Verify Claims page so a Coordinator or Manager can approve or reject more claims
         }
-
+        //***************************************************************************************//
         public IActionResult LecturerLogin()
         {
             return View();

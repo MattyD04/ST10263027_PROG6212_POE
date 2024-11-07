@@ -80,39 +80,8 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
 
         //***************************************************************************************//
-        [HttpPost]
-        public async Task<IActionResult> ProcessClaim(int id) // Automated processing of claim
-        {
-            var claim = await _context.Claims.FindAsync(id);
-            if (claim != null)
-            {
-                // Recalculate the total amount
-                double totalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate;
-
-                // Automated approval/rejection criteria based on total amount
-                if (totalAmount > 1000) // Example threshold: if TotalAmount > R1000, approve
-                {
-                    claim.ClaimStatus = "Approved"; // Automatically approve
-                    TempData["SuccessMessage"] = $"Claim has been approved successfully. Total amount: R{totalAmount}.";
-                }
-                else
-                {
-                    claim.ClaimStatus = "Rejected"; // Automatically reject
-                    TempData["ErrorMessage"] = $"Claim has been rejected due to low amount. Total amount: R{totalAmount}.";
-                }
-
-                // Save the changes to the database
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found."; // Claim not found
-            }
-
-            return RedirectToAction(nameof(VerifyClaims)); // Redirect back to the Verify Claims page
-        }
-
-        //***************************************************************************************//
+       
+        
         public IActionResult LecturerLogin()
         {
             return View();

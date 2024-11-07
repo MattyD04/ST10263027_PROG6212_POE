@@ -26,18 +26,18 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
 
-        [AuthorisingRoles("Lecturer")]
+        [AuthorisingRoles("Lecturer")] //restricts access to the claim submission form for only lecturers
         public IActionResult Privacy()
         {
             return View();
         }
 
-        [AuthorisingRoles("Lecturer")]
+        [AuthorisingRoles("Lecturer")] //restricts access to the tracking of claims page for only lecturers
         public IActionResult TrackClaims()
         {
             return View();
         }
-
+        //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> TrackClaim(string claim_number)
         {
@@ -59,8 +59,8 @@ namespace ST10263027_PROG6212_POE.Controllers
             ViewBag.ClaimStatus = claim.ClaimStatus;
             return View("TrackClaims");
         }
-
-        [AuthorisingRoles("Manager", "Coordinator")]
+        //***************************************************************************************//
+        [AuthorisingRoles("Manager", "Coordinator")] //restricts access to the verifying of claims page to only be accessible by managers and coordinators
         public IActionResult VerifyClaims()
         {
             var claimViewModels = _context.Claims
@@ -81,7 +81,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return View(claimViewModels);
         }
-
+        //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> ApproveClaim(int id)
         {
@@ -99,7 +99,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction(nameof(VerifyClaims));
         }
-
+        //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> RejectClaim(int id)
         {
@@ -117,7 +117,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction(nameof(VerifyClaims));
         }
-
+        //***************************************************************************************//
         public IActionResult LecturerLogin()
         {
             return View();
@@ -138,5 +138,14 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        public IActionResult Logout()
+        {
+            // Clear the session to log the user out
+            HttpContext.Session.Clear();
+
+            // Redirect to the home page or login page
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
+//*************************************End of file**************************************************//

@@ -39,6 +39,15 @@
                             </li>
                         }
                     </ul>
+                    <!-- Move the logout button to the right using 'ms-auto' class -->
+                    @if (HttpContextAccessor.HttpContext.Session.GetString("UserType") != null)
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-action="Logout" asp-controller="Home">Logout</a>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </div>
         </nav>

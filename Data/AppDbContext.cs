@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ST10263027_PROG6212_POE.Models;
-
 using System.Security.Claims;
-
+//this file contains the DBSets for the Lecturer database which has tables for lecturers, coordinators, managers and the claim
 namespace ST10263027_PROG6212_POE.Data
 {
     public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>

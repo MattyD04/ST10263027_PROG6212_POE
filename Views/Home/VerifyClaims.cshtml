@@ -133,8 +133,6 @@
     }
 </style>
 
-
-
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success">
@@ -297,34 +295,22 @@
                 .catch(error => {
                     console.error(`Error ${action.toLowerCase()}ing claim:`, error);
                     showAlert(`Error ${action.toLowerCase()}ing claim. Please try again.`, 'danger');
-                    // Re-enable buttons if there was an error
                     buttons.forEach(button => button.disabled = false);
                 });
         }
 
         function loadPendingClaims() {
-            fetch('/api/VerifyClaimsWebAPI/GetPendingClaims')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+            fetch("/api/VerifyClaimsWebAPI/GetPendingClaims")
+                .then(response => response.json())
                 .then(data => {
-                    // Handle both direct array and wrapped responses
-                    const claims = Array.isArray(data) ? data : (data.value || []);
-                    updateClaimsTable(claims);
-                    updateClaimsCount(claims.length);
+                    updateClaimsCount(data.length);
+                    updateClaimsTable(data);
                 })
-                .catch(error => {
-                    console.error('Error loading claims:', error);
-                    showAlert('Error loading claims. Please try again.', 'danger');
-                });
+                .catch(error => console.error("Error fetching claims:", error));
         }
 
-        // Initial load of claims when page loads
-        document.addEventListener('DOMContentLoaded', loadPendingClaims);
+        document.addEventListener('DOMContentLoaded', function () {
+            loadPendingClaims();
+        });
     </script>
 }
-
-

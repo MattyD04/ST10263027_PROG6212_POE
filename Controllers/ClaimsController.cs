@@ -21,16 +21,16 @@ namespace ST10263027_PROG6212_POE.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitClaim( //method to handle the submission of claims (corrections by Claude AI)
-           string lecturer_number,
-           string claim_number,
-           DateTime submissionDate,
-           double hoursWorked,
-           double hourlyRate,
-           string additionalNotes,
-           IFormFile file)
+        public async Task<IActionResult> SubmitClaim(
+     string lecturer_number,
+     string claim_number,
+     DateTime submissionDate,
+     double hoursWorked,
+     double hourlyRate,
+     string additionalNotes,
+     IFormFile file)
         {
-            // Checks to see if the model state is valid
+            // Checks if the model state is valid
             if (ModelState.IsValid)
             {
                 // Validates file size if file exists
@@ -63,11 +63,21 @@ namespace ST10263027_PROG6212_POE.Controllers
                     Password = "default_password" // Assigns a default password (for error handling)
                 };
 
-                // Add lecturer to the database
-                _context.Lecturers.Add(lecturer);
-                await _context.SaveChangesAsync();
+                // Add lecturer to the database if not already present
+                var existingLecturer = await _context.Lecturers
+                    .FirstOrDefaultAsync(l => l.LecturerNum == lecturer_number);
 
-                // Creates a Claim object if it does not exist
+                if (existingLecturer == null)
+                {
+                    _context.Lecturers.Add(lecturer);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    lecturer = existingLecturer; // Use existing lecturer if found
+                }
+
+                // Creates a Claim object
                 var claim = new Claim
                 {
                     ClaimNum = claim_number,
@@ -85,26 +95,32 @@ namespace ST10263027_PROG6212_POE.Controllers
                         await file.CopyToAsync(memoryStream);
                         claim.FileData = memoryStream.ToArray();
                         claim.Filename = file.FileName;
-                        claim.ContentType = file.ContentType;
+                        claim.ContentType = file.ContentType;  // Ensure this is set properly
                     }
+                }
+                else
+                {
+                    // If no file is uploaded, set an empty byte array for FileData
+                    claim.FileData = new byte[0]; // Empty byte array to avoid null insertion
+                    claim.ContentType = "application/octet-stream"; // Default content type for no file
                 }
 
                 // Add claim to the database
                 _context.Claims.Add(claim);
                 await _context.SaveChangesAsync();
 
-                
-                TempData["SuccessMessage"] = "Your claim has been submitted successfully."; //message displays if the claim has been submitted successfully
-                TempData["UploadedFileName"] = claim.Filename; //displays the name of the file submitted
+                TempData["SuccessMessage"] = "Your claim has been submitted successfully."; // Message displays if the claim has been submitted successfully
+                TempData["UploadedFileName"] = claim.Filename; // Displays the name of the file submitted
 
-                return RedirectToAction("Privacy", "Home"); //redirects back to the Claim submission form so more claims can be submitted
+                return RedirectToAction("Privacy", "Home"); // Redirects back to the Claim submission form so more claims can be submitted
             }
 
             // If model state is not valid, return to the form
             return View();
         }
 
-        
+
+
     }
 }
 //**************************************************end of file***********************************************//

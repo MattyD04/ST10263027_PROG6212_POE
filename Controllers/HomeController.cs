@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
-     
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -35,24 +34,25 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View();
         }
+
         //***************************************************************************************//
         [HttpPost]
         public async Task<IActionResult> TrackClaim(string claim_number)
         {
             if (string.IsNullOrEmpty(claim_number))
             {
-                TempData["ErrorMessage"] = "Claim Number is required."; //if a user tries to track a claim without inputting the number then this message displays
-                return View("TrackClaims"); 
+                TempData["ErrorMessage"] = "Claim Number is required."; // If a user tries to track a claim without inputting the number
+                return View("TrackClaims");
             }
             var claim = await _context.Claims
                 .FirstOrDefaultAsync(c => c.ClaimNum == claim_number);
             if (claim == null)
             {
-                TempData["ErrorMessage"] = "Claim not found for the provided claim number."; //if a user enters an invalid claim number then this message displays
-                return View("TrackClaims"); 
+                TempData["ErrorMessage"] = "Claim not found for the provided claim number."; // If a user enters an invalid claim number
+                return View("TrackClaims");
             }
             ViewBag.ClaimStatus = claim.ClaimStatus;
-            return View("TrackClaims"); 
+            return View("TrackClaims");
         }
 
         //***************************************************************************************//
@@ -62,73 +62,56 @@ namespace ST10263027_PROG6212_POE.Controllers
                 .Where(claim => claim.ClaimStatus == "Pending")
                 .Select(claim => new ClaimViewModel
                 {
-                    ClaimID = claim.ClaimID, //fetches the ClaimID
-                    ClaimNum = claim.ClaimNum, //fetches the Claim Number
-                    LecturerNum = claim.Lecturer.LecturerNum, //fetches the Lecturer Number
-                    SubmissionDate = claim.SubmissionDate, //fetches the submission date of the claim
-                    HoursWorked = claim.Lecturer.HoursWorked, //fetches the lecturer's hours worked
-                    HourlyRate = claim.Lecturer.HourlyRate, // fetches the lecturer's hourly rate
-                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate, //calculates the total amount of the contract by multiplying the lecturer's hours worked and hourly rate
-                    Comments = claim.Comments, //fetches the comments submitted by the lecturer
-                    Filename = claim.Filename //fetches the name of the file submitted by the lecturer
+                    ClaimID = claim.ClaimID, // Fetches the ClaimID
+                    ClaimNum = claim.ClaimNum, // Fetches the Claim Number
+                    LecturerNum = claim.Lecturer.LecturerNum, // Fetches the Lecturer Number
+                    SubmissionDate = claim.SubmissionDate, // Fetches the submission date of the claim
+                    HoursWorked = claim.Lecturer.HoursWorked, // Fetches the lecturer's hours worked
+                    HourlyRate = claim.Lecturer.HourlyRate, // Fetches the lecturer's hourly rate
+                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate, // Calculates the total amount of the contract
+                    Comments = claim.Comments, // Fetches the comments submitted by the lecturer
+                    Filename = claim.Filename // Fetches the name of the file submitted by the lecturer
                 })
                 .ToList();
 
-            var validator = new ClaimViewModelValidator();
-            var validationResults = claimViewModels.Select(model => validator.Validate(model));
+            
 
-            // Iterate through validation results
-            foreach (var result in validationResults)
+            return View(claimViewModels); // Return the view after all validations
+        }
+
+        //***************************************************************************************//
+        [HttpPost]
+        public async Task<IActionResult> ProcessClaim(int id) // Automated processing of claim
+        {
+            var claim = await _context.Claims.FindAsync(id);
+            if (claim != null)
             {
-                if (!result.IsValid)
+                // Recalculate the total amount
+                double totalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate;
+
+                // Automated approval/rejection criteria based on total amount
+                if (totalAmount > 1000) // Example threshold: if TotalAmount > R1000, approve
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                    }
+                    claim.ClaimStatus = "Approved"; // Automatically approve
+                    TempData["SuccessMessage"] = $"Claim has been approved successfully. Total amount: R{totalAmount}.";
                 }
-            }
+                else
+                {
+                    claim.ClaimStatus = "Rejected"; // Automatically reject
+                    TempData["ErrorMessage"] = $"Claim has been rejected due to low amount. Total amount: R{totalAmount}.";
+                }
 
-            // Return view after all validations are processed
-            return View(claimViewModels);
-        }
-
-        //***************************************************************************************//
-        [HttpPost]
-        public async Task<IActionResult> ApproveClaim(int id) // Method for handling the approval of a claim
-        {
-            var claim = await _context.Claims.FindAsync(id);
-            if (claim != null)
-            {
-                claim.ClaimStatus = "Approved"; // Updates the claim status to 'Approved'
+                // Save the changes to the database
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Claim has been approved successfully."; // Displays if a claim is approved
             }
             else
             {
-                TempData["ErrorMessage"] = "Claim not found."; // Displays if a claim is not found
+                TempData["ErrorMessage"] = "Claim not found."; // Claim not found
             }
 
-            return RedirectToAction(nameof(VerifyClaims)); // Redirects to the Verify Claims page so a Coordinator or Manager can approve or reject more claims
+            return RedirectToAction(nameof(VerifyClaims)); // Redirect back to the Verify Claims page
         }
-        //***************************************************************************************//
-        [HttpPost]
-        public async Task<IActionResult> RejectClaim(int id) // Method for handling the rejection of a claim
-        {
-            var claim = await _context.Claims.FindAsync(id);
-            if (claim != null)
-            {
-                claim.ClaimStatus = "Rejected"; // Updates the claim status to 'Rejected'
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Claim has been rejected successfully."; // Displays if a claim is rejected successfully
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found."; // Displays if a claim is not found
-            }
 
-            return RedirectToAction(nameof(VerifyClaims)); // Redirects to the Verify Claims page so a Coordinator or Manager can approve or reject more claims
-        }
         //***************************************************************************************//
         public IActionResult LecturerLogin()
         {
@@ -152,4 +135,3 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
     }
 }
-//**************************************************end of file***********************************************//

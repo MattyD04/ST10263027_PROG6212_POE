@@ -11,7 +11,7 @@ namespace ST10263027_PROG6212_POE.Controllers
     public class VerifyClaimsWebAPIController : ControllerBase
     {
         private readonly AppDbContext _context;
-
+        
         public VerifyClaimsWebAPIController(AppDbContext context)
         {
             _context = context;
@@ -60,7 +60,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
                 claim.ClaimStatus = "Approved";
                 await _context.SaveChangesAsync();
-
+                
                 return Ok(new { message = "Claim approved successfully" });
             }
             catch (Exception ex)
@@ -82,7 +82,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
                 claim.ClaimStatus = "Rejected";
                 await _context.SaveChangesAsync();
-
+                
                 return Ok(new { message = "Claim rejected successfully" });
             }
             catch (Exception ex)

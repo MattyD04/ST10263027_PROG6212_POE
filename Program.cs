@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ST10263027_PROG6212_POE.Data;
 using FluentValidation.AspNetCore;
-using FluentValidation; // Ensure you have this namespace for FluentValidation
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,14 @@ builder.Services.AddFluentValidationAutoValidation() // Automatically validates 
                 .AddFluentValidationClientsideAdapters() // Client-side validation
                 .AddValidatorsFromAssemblyContaining<ClaimViewModelValidator>(); // Register your validators
 
+// Add session services
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout duration
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true; // Required for GDPR compliance
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,18 +38,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseSession(); // Enable session middleware before authorization
 app.UseAuthorization();
 
 // Set up the default route to always open Index.cshtml in HomeController
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Redirect the root URL to Home/Index
-app.MapGet("/", context =>
-{
-    context.Response.Redirect("/Home/Index");
-    return Task.CompletedTask;
-});
 
 app.Run();

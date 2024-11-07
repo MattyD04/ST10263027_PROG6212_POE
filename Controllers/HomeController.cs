@@ -6,10 +6,10 @@ using ST10263027_PROG6212_POE.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using ST10263027_PROG6212_POE.Roles;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
-
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -26,11 +26,13 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
 
+        [AuthorisingRoles("Lecturer")]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [AuthorisingRoles("Lecturer")]
         public IActionResult TrackClaims()
         {
             return View();
@@ -44,17 +46,21 @@ namespace ST10263027_PROG6212_POE.Controllers
                 TempData["ErrorMessage"] = "Claim Number is required.";
                 return View("TrackClaims");
             }
+
             var claim = await _context.Claims
                 .FirstOrDefaultAsync(c => c.ClaimNum == claim_number);
+
             if (claim == null)
             {
                 TempData["ErrorMessage"] = "Claim not found for the provided claim number.";
                 return View("TrackClaims");
             }
+
             ViewBag.ClaimStatus = claim.ClaimStatus;
             return View("TrackClaims");
         }
 
+        [AuthorisingRoles("Manager", "Coordinator")]
         public IActionResult VerifyClaims()
         {
             var claimViewModels = _context.Claims

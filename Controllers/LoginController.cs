@@ -33,14 +33,17 @@ namespace ST10263027_PROG6212_POE.Controllers
             }
             if (isManager)
             {
+                HttpContext.Session.SetString("UserType", "Manager");
                 return await HandleManagerLogin(username, password);
             }
             else if (isCoordinator)
             {
+                HttpContext.Session.SetString("UserType", "Coordinator");
                 return await HandleCoordinatorLogin(username, password);
             }
             else
             {
+                HttpContext.Session.SetString("UserType", "Lecturer");
                 return await HandleLecturerLogin(username, password);
             }
         }

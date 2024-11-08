@@ -14,27 +14,51 @@ namespace ST10263027_PROG6212_POE.Controllers
             _context = context;
         }
 
-        private (bool isValid, string errorMessage) ValidatePassword(string password)
+        private (bool isValid, List<string> errorMessages) ValidatePassword(string password)
         {
+            var errors = new List<string>();
+
             if (string.IsNullOrEmpty(password))
-                return (false, "Password cannot be empty.");
+            {
+                errors.Add("Password cannot be empty.");
+                return (false, errors);
+            }
 
             if (password.Length < 8)
-                return (false, "Password must be at least 8 characters long.");
+                errors.Add("Password must be at least 8 characters long.");
 
             if (!Regex.IsMatch(password, @"[A-Z]"))
-                return (false, "Password must contain at least one uppercase letter.");
+                errors.Add("Password must contain at least one uppercase letter.");
 
             if (!Regex.IsMatch(password, @"[a-z]"))
-                return (false, "Password must contain at least one lowercase letter.");
+                errors.Add("Password must contain at least one lowercase letter.");
 
             if (!Regex.IsMatch(password, @"[0-9]"))
-                return (false, "Password must contain at least one number.");
+                errors.Add("Password must contain at least one number.");
 
             if (!Regex.IsMatch(password, @"[!@#$%^&*(),.?"":{}|<>]"))
-                return (false, "Password must contain at least one special character.");
+                errors.Add("Password must contain at least one special character (e.g. !@#$%^&*(),.?\":{}|<>).");
 
-            return (true, string.Empty);
+            return (errors.Count == 0, errors);
+        }
+
+        private (bool isValid, List<string> errorMessages) ValidateUsername(string username)
+        {
+            var errors = new List<string>();
+
+            if (string.IsNullOrEmpty(username))
+            {
+                errors.Add("Username cannot be empty.");
+                return (false, errors);
+            }
+
+            if (username.Length < 6 || !Regex.IsMatch(username, @"^\d+$"))
+            {
+                errors.Add("Username must be at least 6 numbers long.");
+                return (false, errors);
+            }
+
+            return (true, errors);
         }
 
         [HttpGet]
@@ -64,16 +88,17 @@ namespace ST10263027_PROG6212_POE.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password, bool isManager = false, bool isCoordinator = false)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                TempData["ErrorMessage"] = "Please enter both Username and Password.";
-                return ReturnToAppropriateLoginView(isManager, isCoordinator);
-            }
+            var (isValidUsername, usernameErrors) = ValidateUsername(username);
+            var (isValidPassword, passwordErrors) = ValidatePassword(password);
 
-            var (isValid, errorMessage) = ValidatePassword(password);
-            if (!isValid)
+            if (!isValidUsername || !isValidPassword)
             {
-                TempData["ErrorMessage"] = errorMessage;
+                var errors = new List<string>();
+                errors.AddRange(usernameErrors);
+                errors.AddRange(passwordErrors);
+
+                // Use Environment.NewLine instead of HTML <br/> tags
+                TempData["ErrorMessage"] = string.Join("\n", errors);
                 return ReturnToAppropriateLoginView(isManager, isCoordinator);
             }
 

@@ -94,7 +94,9 @@
         }
         <form asp-action="Login" asp-controller="Login" method="post">
             <p>Please enter your login details:</p>
-            <input type="text" name="username" placeholder="Username" required />
+            <p>Coordinator Number:</p>
+            <input type="text" name="username" placeholder="Coordinator Num" required />
+            <p>Password:</p>
             <input type="password" name="password" placeholder="Password" required />
             <input type="hidden" name="isCoordinator" value="true" />
             <button type="submit">Login</button>

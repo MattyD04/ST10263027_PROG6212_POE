@@ -12,7 +12,7 @@
         public double TotalAmount { get; set; } //total amount of the multiplication of a lecturer's hours worked and their hourly rate
         public string Comments { get; set; } //comments submitted by the lecturer from the claim table
         public string Filename { get; set; } //name of the file in the claim table
-        public string ClaimStatus { get; set; }
+        public string ClaimStatus { get; set; }//the status of a claim 
     }
 }
 //**************************************************end of file***********************************************//

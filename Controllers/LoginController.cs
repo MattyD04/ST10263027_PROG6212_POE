@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ST10263027_PROG6212_POE.Data;
 using ST10263027_PROG6212_POE.Models;
+using System.Text.RegularExpressions;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
@@ -13,10 +14,32 @@ namespace ST10263027_PROG6212_POE.Controllers
             _context = context;
         }
 
+        private (bool isValid, string errorMessage) ValidatePassword(string password)
+        {
+            if (string.IsNullOrEmpty(password))
+                return (false, "Password cannot be empty.");
+
+            if (password.Length < 8)
+                return (false, "Password must be at least 8 characters long.");
+
+            if (!Regex.IsMatch(password, @"[A-Z]"))
+                return (false, "Password must contain at least one uppercase letter.");
+
+            if (!Regex.IsMatch(password, @"[a-z]"))
+                return (false, "Password must contain at least one lowercase letter.");
+
+            if (!Regex.IsMatch(password, @"[0-9]"))
+                return (false, "Password must contain at least one number.");
+
+            if (!Regex.IsMatch(password, @"[!@#$%^&*(),.?"":{}|<>]"))
+                return (false, "Password must contain at least one special character.");
+
+            return (true, string.Empty);
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
-            // Redirect to the Home/Index view
             return RedirectToAction("Index", "Home");
         }
 
@@ -37,19 +60,21 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View("~/Views/Home/LecturerLogin.cshtml");
         }
-        //***************************************************************************************//
+
         [HttpPost]
         public async Task<IActionResult> Login(string username, string password, bool isManager = false, bool isCoordinator = false)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 TempData["ErrorMessage"] = "Please enter both Username and Password.";
-                if (isManager)
-                    return View("~/Views/Home/AcademicManagerLogin.cshtml");
-                else if (isCoordinator)
-                    return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
-                else
-                    return View("~/Views/Home/LecturerLogin.cshtml");
+                return ReturnToAppropriateLoginView(isManager, isCoordinator);
+            }
+
+            var (isValid, errorMessage) = ValidatePassword(password);
+            if (!isValid)
+            {
+                TempData["ErrorMessage"] = errorMessage;
+                return ReturnToAppropriateLoginView(isManager, isCoordinator);
             }
 
             if (isManager)
@@ -68,7 +93,17 @@ namespace ST10263027_PROG6212_POE.Controllers
                 return await HandleLecturerLoginPost(username, password);
             }
         }
-        //***************************************************************************************//
+
+        private IActionResult ReturnToAppropriateLoginView(bool isManager, bool isCoordinator)
+        {
+            if (isManager)
+                return View("~/Views/Home/AcademicManagerLogin.cshtml");
+            else if (isCoordinator)
+                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
+            else
+                return View("~/Views/Home/LecturerLogin.cshtml");
+        }
+
         private async Task<IActionResult> HandleManagerLoginPost(string username, string password)
         {
             var academicManager = await _context.AcademicManagers
@@ -93,15 +128,9 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction("VerifyClaims", "Home");
         }
-        //***************************************************************************************//
+
         private async Task<IActionResult> HandleCoordinatorLoginPost(string username, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                TempData["ErrorMessage"] = "Please enter both Username and Password.";
-                return View("~/Views/Home/ProgrammeCoordinatorLogin.cshtml");
-            }
-
             var coordinator = await _context.ProgrammeCoordinators
                 .FirstOrDefaultAsync(pc => pc.CoordinatorNum == username);
 
@@ -124,7 +153,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return RedirectToAction("VerifyClaims", "Home");
         }
-        //***************************************************************************************//
+
         private async Task<IActionResult> HandleLecturerLoginPost(string username, string password)
         {
             var lecturer = await _context.Lecturers
@@ -151,4 +180,3 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
     }
 }
-//*************************************End of file**************************************************//

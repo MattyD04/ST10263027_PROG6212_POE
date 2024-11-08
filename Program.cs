@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ST10263027_PROG6212_POE.Data;
-using FluentValidation.AspNetCore;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +13,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register FluentValidation services
-builder.Services.AddFluentValidationAutoValidation() // Automatically validates models
-                .AddFluentValidationClientsideAdapters() // Client-side validation
-                .AddValidatorsFromAssemblyContaining<ClaimViewModelValidator>(); // Register your validators
+builder.Services.AddControllersWithViews()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ClaimViewModelValidator>()); // Register validators
 
 // Add session services
 builder.Services.AddSession(options =>
@@ -39,6 +38,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession(); // Enable session middleware before authorization
+
+app.UseAuthentication(); // Required if using ASP.NET Identity
 app.UseAuthorization();
 
 // Set up the default route to always open Index.cshtml in HomeController

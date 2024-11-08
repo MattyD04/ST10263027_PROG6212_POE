@@ -7,21 +7,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ST10263027_PROG6212_POE.Roles;
+using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly AppDbContext _context;
+            private readonly ILogger<HomeController> _logger;
+            private readonly AppDbContext _context;
+            private readonly IValidator<ClaimViewModel> _validator;
 
-        public HomeController(ILogger<HomeController> logger, AppDbContext context)
-        {
-            _logger = logger;
-            _context = context;
-        }
+            public HomeController(ILogger<HomeController> logger, AppDbContext context, IValidator<ClaimViewModel> validator)
+            {
+                _logger = logger;
+                _context = context;
+                _validator = validator;
+            }
 
-        public IActionResult Index()
+
+            public IActionResult Index()
         {
             return View();
         }
@@ -88,9 +93,36 @@ namespace ST10263027_PROG6212_POE.Controllers
             var claim = await _context.Claims.FindAsync(id);
             if (claim != null)
             {
-                claim.ClaimStatus = "Approved";
+                var claimViewModel = new ClaimViewModel
+                {
+                    ClaimID = claim.ClaimID,
+                    ClaimNum = claim.ClaimNum,
+                    LecturerNum = claim.Lecturer.LecturerNum,
+                    SubmissionDate = claim.SubmissionDate,
+                    HoursWorked = claim.Lecturer.HoursWorked,
+                    HourlyRate = claim.Lecturer.HourlyRate,
+                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
+                    Comments = claim.Comments,
+                    Filename = claim.Filename
+                };
+
+                // Validate claim
+                var validationResult = await _validator.ValidateAsync(claimViewModel);
+
+                if (validationResult.IsValid)
+                {
+                    // Automatically approve the claim if it meets the criteria
+                    claim.ClaimStatus = "Approved";
+                    TempData["SuccessMessage"] = "Claim has been automatically approved due to policy.";
+                }
+                else
+                {
+                    // Handle cases where claim validation fails
+                    TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
+                    return RedirectToAction(nameof(VerifyClaims));
+                }
+
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Claim has been approved successfully.";
             }
             else
             {

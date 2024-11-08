@@ -1,4 +1,6 @@
-﻿namespace ST10263027_PROG6212_POE.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ST10263027_PROG6212_POE.Models
 {
     //claimviewmodel to combine the details of lecturers and claims together
     public class ClaimViewModel
@@ -13,6 +15,7 @@
         public string Comments { get; set; } //comments submitted by the lecturer from the claim table
         public string Filename { get; set; } //name of the file in the claim table
         public string ClaimStatus { get; set; }//the status of a claim 
+       
     }
 }
 //**************************************************end of file***********************************************//

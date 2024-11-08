@@ -22,13 +22,13 @@ namespace ST10263027_PROG6212_POE.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitClaim(
-     string lecturer_number,
-     string claim_number,
-     DateTime submissionDate,
-     double hoursWorked,
-     double hourlyRate,
-     string additionalNotes,
-     IFormFile file)
+            string lecturer_number,
+            string claim_number,
+            DateTime submissionDate,
+            double hoursWorked,
+            double hourlyRate,
+            string additionalNotes,
+            IFormFile file)
         {
             // Checks to see if the model state is valid
             if (ModelState.IsValid)
@@ -74,7 +74,11 @@ namespace ST10263027_PROG6212_POE.Controllers
                     LecturerID = lecturer.LecturerId,
                     SubmissionDate = submissionDate,
                     ClaimStatus = "Pending",
-                    Comments = additionalNotes
+                    Comments = additionalNotes,
+                    // Initialize with empty byte array instead of null
+                    FileData = new byte[0],
+                    Filename = file?.FileName ?? string.Empty,
+                    ContentType = file?.ContentType ?? "application/octet-stream"
                 };
 
                 // Process file if it exists
@@ -84,14 +88,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                     {
                         await file.CopyToAsync(memoryStream);
                         claim.FileData = memoryStream.ToArray();
-                        claim.Filename = file.FileName;
-                        claim.ContentType = file.ContentType;  // Ensure this is set properly
                     }
-                }
-                else
-                {
-                    // If no file is uploaded, set a default value for ContentType
-                    claim.ContentType = "application/octet-stream";  // Default binary stream type
                 }
 
                 // Add claim to the database
@@ -107,8 +104,5 @@ namespace ST10263027_PROG6212_POE.Controllers
             // If model state is not valid, return to the form
             return View();
         }
-
-
     }
 }
-//**************************************************end of file***********************************************//

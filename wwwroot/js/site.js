@@ -2,6 +2,8 @@
     // Caching the DOM elements
     const $hoursWorked = $('input[name="hoursWorked"]');
     const $hourlyRate = $('input[name="hourlyRate"]');
+    const $lecturerNumber = $('input[name="lecturer_number"]');
+    const $claimNumber = $('input[name="claim_number"]');
     const $form = $('form');
     const $fileInput = $('input[type="file"]');
     const $totalAmountDisplay = $('.total-amount-display');
@@ -27,6 +29,16 @@
         return rate > 0; // Only checking that rate is positive
     }
 
+    function validateLecturerNumber(lecturerNumber) {
+        // Ensure lecturer number is at least 6 digits long
+        return lecturerNumber.toString().length >= 6;
+    }
+
+    function validateClaimNumber(claimNumber) {
+        // Ensure claim number is at least 6 digits long
+        return claimNumber.toString().length >= 6;
+    }
+
     function validateFileSize() {
         // Function to validate the size of a file
         const fileInput = $fileInput[0];
@@ -40,6 +52,30 @@
     // Event listeners for input fields
     $hoursWorked.on('input', calculateTotal);
     $hourlyRate.on('input', calculateTotal);
+    $lecturerNumber.on('input', function () {
+        const $existingError = $(this).next('.invalid-feedback');
+        if (!validateLecturerNumber($(this).val())) {
+            $(this).addClass('is-invalid');
+            if ($existingError.length === 0) {
+                $(this).after('<div class="invalid-feedback">Lecturer number must be at least 6 digits long</div>');
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+            $('.invalid-feedback').remove();
+        }
+    });
+    $claimNumber.on('input', function () {
+        const $existingError = $(this).next('.invalid-feedback');
+        if (!validateClaimNumber($(this).val())) {
+            $(this).addClass('is-invalid');
+            if ($existingError.length === 0) {
+                $(this).after('<div class="invalid-feedback">Claim number must be at least 6 digits long</div>');
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+            $('.invalid-feedback').remove();
+        }
+    });
 
     // File input validation
     $fileInput.on('change', function () {
@@ -59,6 +95,8 @@
     $form.on('submit', function (e) {
         const hours = parseFloat($hoursWorked.val());
         const rate = parseFloat($hourlyRate.val());
+        const lecturerNumber = $lecturerNumber.val();
+        const claimNumber = $claimNumber.val();
 
         // Clear existing error messages
         $('.invalid-feedback').remove();
@@ -77,6 +115,20 @@
         if (!validateRate(rate)) {
             $hourlyRate.addClass('is-invalid');
             $hourlyRate.after('<div class="invalid-feedback">Please enter a positive rate</div>');
+            isValid = false;
+        }
+
+        // Validate the lecturer's number
+        if (!validateLecturerNumber(lecturerNumber)) {
+            $lecturerNumber.addClass('is-invalid');
+            $lecturerNumber.after('<div class="invalid-feedback">Lecturer number must be at least 6 digits long</div>');
+            isValid = false;
+        }
+
+        // Validate the claim number
+        if (!validateClaimNumber(claimNumber)) {
+            $claimNumber.addClass('is-invalid');
+            $claimNumber.after('<div class="invalid-feedback">Claim number must be at least 6 digits long</div>');
             isValid = false;
         }
 

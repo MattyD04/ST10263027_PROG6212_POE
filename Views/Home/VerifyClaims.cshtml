@@ -238,29 +238,29 @@
 
             if (claims.length === 0) {
                 tableBody.innerHTML = `
-                                            <tr>
-                                                <td colspan="9" class="no-claims-message">No pending claims to display.</td>
-                                            </tr>`;
+                            <tr>
+                                <td colspan="9" class="no-claims-message">No pending claims to display.</td>
+                            </tr>`;
                 return;
             }
 
             claims.forEach(claim => {
                 const submissionDate = new Date(claim.submissionDate).toLocaleDateString('en-ZA');
                 const row = `
-                                            <tr>
-                                                <td>${claim.claimNum}</td>
-                                                <td>${claim.lecturerNum}</td>
-                                                <td>${submissionDate}</td>
-                                                <td>${Number(claim.hoursWorked).toFixed(2)}</td>
-                                                <td>R${Number(claim.hourlyRate).toFixed(2)}</td>
-                                                <td>R${Number(claim.totalAmount).toFixed(2)}</td>
-                                                <td class="notes-cell" title="${claim.comments}">${claim.comments}</td>
-                                                <td>${claim.filename || 'No file'}</td>
-                                                <td class="action-buttons">
-                                                    <button onclick="handleClaimAction(${claim.claimID}, 'Approve')" class="accept-btn">Approve</button>
-                                                    <button onclick="handleClaimAction(${claim.claimID}, 'Reject')" class="reject-btn">Reject</button>
-                                                </td>
-                                            </tr>`;
+                            <tr>
+                                <td>${claim.claimNum}</td>
+                                <td>${claim.lecturerNum}</td>
+                                <td>${submissionDate}</td>
+                                <td>${Number(claim.hoursWorked).toFixed(2)}</td>
+                                <td>R${Number(claim.hourlyRate).toFixed(2)}</td>
+                                <td>R${Number(claim.totalAmount).toFixed(2)}</td>
+                                <td class="notes-cell" title="${claim.comments}">${claim.comments}</td>
+                                <td>${claim.filename || 'No file'}</td>
+                                <td class="action-buttons">
+                                    <button onclick="handleClaimAction(${claim.claimID}, 'Approve')" class="accept-btn">Approve</button>
+                                    <button onclick="handleClaimAction(${claim.claimID}, 'Reject')" class="reject-btn">Reject</button>
+                                </td>
+                            </tr>`;
                 tableBody.insertAdjacentHTML('beforeend', row);
             });
         }
@@ -270,12 +270,16 @@
                 return;
             }
 
-            // Find and disable the buttons for this specific claim
             const currentRow = document.querySelector(`button[onclick*="${claimId}"]`).closest('tr');
             const buttons = currentRow.querySelectorAll('button');
             buttons.forEach(button => button.disabled = true);
 
-            fetch(`/Home/${action}Claim?id=${claimId}`, {
+            // Add `isManual=true` for approve action
+            const url = action === 'Approve'
+                ? `/Home/${action}Claim?id=${claimId}&isManual=true`
+                : `/Home/${action}Claim?id=${claimId}`;
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
@@ -284,7 +288,6 @@
                 .then(response => {
                     if (response.ok) {
                         showAlert(`Claim has been ${action.toLowerCase()}d successfully.`, 'success');
-                        // Wait a brief moment before refreshing the claims list
                         setTimeout(loadPendingClaims, 500);
                     } else {
                         throw new Error(`HTTP error! status: ${response.status}`);

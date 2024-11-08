@@ -205,6 +205,8 @@
     </div>
 </div>
 
+
+
 @section Scripts {
     <script>
         function showAlert(message, type) {
@@ -274,10 +276,7 @@
             const buttons = currentRow.querySelectorAll('button');
             buttons.forEach(button => button.disabled = true);
 
-            // Add `isManual=true` for approve action
-            const url = action === 'Approve'
-                ? `/Home/${action}Claim?id=${claimId}&isManual=true`
-                : `/Home/${action}Claim?id=${claimId}`;
+            const url = `/api/VerifyClaimsWebAPI/${action.toLowerCase()}?claimId=${claimId}`;
 
             fetch(url, {
                 method: 'POST',
@@ -285,30 +284,33 @@
                     'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 }
             })
-                .then(response => {
-                    if (response.ok) {
-                        showAlert(`Claim has been ${action.toLowerCase()}d successfully.`, 'success');
-                        setTimeout(loadPendingClaims, 500);
-                    } else {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                })
-                .catch(error => {
-                    console.error(`Error ${action.toLowerCase()}ing claim:`, error);
-                    showAlert(`Error ${action.toLowerCase()}ing claim. Please try again.`, 'danger');
+            .then(response => {
+                if (response.ok) {
+                    showAlert(`Claim has been ${action.toLowerCase()}d successfully.`, 'success');
+                    setTimeout(loadPendingClaims, 500);
+                } else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                if (data) {
+                    showAlert(`Error ${action.toLowerCase()}ing claim: ${data.join(', ')}`, 'danger');
                     buttons.forEach(button => button.disabled = false);
-                });
+                }
+            })
+            .catch(error => {
+                console.error(`Error ${action.toLowerCase()}ing claim:`, error);
+                showAlert(`Error ${action.toLowerCase()}ing claim. Please try again.`, 'danger');
+                buttons.forEach(button => button.disabled = false);
+            });
         }
 
         function loadPendingClaims() {
-            fetch("/Home/VerifyClaims")
-                .then(response => response.text())
+            fetch("/api/VerifyClaimsWebAPI")
+                .then(response => response.json())
                 .then(data => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(data, 'text/html');
-                    const claims = JSON.parse(doc.querySelector('#claimsData').textContent);
-                    updateClaimsCount(claims.length);
-                    updateClaimsTable(claims);
+                    updateClaimsCount(data.length);
+                    updateClaimsTable(data);
                 })
                 .catch(error => console.error("Error fetching claims:", error));
         }

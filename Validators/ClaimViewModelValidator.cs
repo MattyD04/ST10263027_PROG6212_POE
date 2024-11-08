@@ -16,12 +16,18 @@ public class ClaimViewModelValidator : AbstractValidator<ClaimViewModel>
         RuleFor(c => c.HourlyRate)
             .GreaterThan(0).WithMessage("Hourly Rate must be greater than 0.");
         RuleFor(c => c.TotalAmount)
-            .GreaterThan(0).WithMessage("Total Amount must be greater than 0.")
-            .LessThanOrEqualTo(15000)
-            .WithMessage("Total Amount is R15,000 or less, so approved automatically due to policy.")
-            .When(c => c.TotalAmount <= 15000)
-            .WithState(c => new { c.TotalAmount })
-            .Must(totalAmount => totalAmount <= 15000)
-            .WithMessage("Total Amount is greater than R15,000 and cannot be automatically approved.");
+            .GreaterThan(0).WithMessage("Total Amount must be greater than 0.");
+
+        // Add a new rule to check if the TotalAmount is less than or equal to R15,000
+        When(c => c.TotalAmount <= 15000, () =>
+        {
+            RuleFor(c => c.TotalAmount).Must(a => true).WithMessage("Claim has been automatically approved due to policy."); // This will automatically approve the claim
+        });
+
+        // Keep the existing rule for claims greater than R15,000
+        When(c => c.TotalAmount > 15000, () =>
+        {
+            RuleFor(c => c.TotalAmount).Must(a => false).WithMessage("Total Amount is greater than R15,000 and cannot be automatically approved.");
+        });
     }
 }

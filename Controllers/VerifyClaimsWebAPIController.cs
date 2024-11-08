@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using ST10263027_PROG6212_POE.Data;
 using ST10263027_PROG6212_POE.Models;
+using System.Threading.Tasks;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
@@ -12,114 +13,93 @@ namespace ST10263027_PROG6212_POE.Controllers
     public class VerifyClaimsWebAPIController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly IValidator<ClaimViewModel> _claimValidator;
+        private readonly IValidator<ClaimViewModel> _validator;
 
-        public VerifyClaimsWebAPIController(AppDbContext context, IValidator<ClaimViewModel> claimValidator)
+        public VerifyClaimsWebAPIController(AppDbContext context, IValidator<ClaimViewModel> validator)
         {
             _context = context;
-            _claimValidator = claimValidator;
+            _validator = validator;
         }
 
-        [HttpGet("GetPendingClaims")]
-        public async Task<ActionResult<IEnumerable<ClaimViewModel>>> GetPendingClaims()
+        [HttpGet]
+        public async Task<IActionResult> GetPendingClaims()
         {
-            try
-            {
-                var claims = await _context.Claims
-                    .Include(c => c.Lecturer)
-                    .Where(c => c.ClaimStatus == "Pending")
-                    .Select(c => new ClaimViewModel
-                    {
-                        ClaimID = c.ClaimID,
-                        ClaimNum = c.ClaimNum ?? "",
-                        LecturerNum = c.Lecturer.LecturerNum ?? "",
-                        SubmissionDate = c.SubmissionDate,
-                        HoursWorked = c.Lecturer.HoursWorked,
-                        HourlyRate = c.Lecturer.HourlyRate,
-                        TotalAmount = c.Lecturer.HoursWorked * c.Lecturer.HourlyRate,
-                        Comments = c.Comments ?? "",
-                        Filename = c.Filename ?? ""
-                    })
-                    .ToListAsync();
+            var claimViewModels = await _context.Claims
+                .Where(claim => claim.ClaimStatus == "Pending")
+                .Select(claim => new ClaimViewModel
+                {
+                    ClaimID = claim.ClaimID,
+                    ClaimNum = claim.ClaimNum,
+                    LecturerNum = claim.Lecturer.LecturerNum,
+                    SubmissionDate = claim.SubmissionDate,
+                    HoursWorked = claim.Lecturer.HoursWorked,
+                    HourlyRate = claim.Lecturer.HourlyRate,
+                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
+                    Comments = claim.Comments,
+                    Filename = claim.Filename
+                })
+                .ToListAsync();
 
-                return Ok(claims);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error retrieving claims", error = ex.Message });
-            }
+            return Ok(claimViewModels);
         }
 
-        [HttpPut("ApproveClaim/{id}")]
-        public async Task<IActionResult> ApproveClaim(int id, [FromBody] ClaimViewModel claimViewModel)
+        [HttpPost]
+        [Route("approve")]
+        public async Task<IActionResult> ApproveClaim(int claimId, bool isManual = false)
         {
-            try
+            var claim = await _context.Claims.Include(c => c.Lecturer).FirstOrDefaultAsync(c => c.ClaimID == claimId);
+            if (claim == null)
             {
-                // Validate the incoming ClaimViewModel using FluentValidation
-                var validationResult = await _claimValidator.ValidateAsync(claimViewModel);
+                return NotFound();
+            }
+
+            // Create a view model for validation
+            var claimViewModel = new ClaimViewModel
+            {
+                ClaimID = claim.ClaimID,
+                ClaimNum = claim.ClaimNum,
+                LecturerNum = claim.Lecturer.LecturerNum,
+                SubmissionDate = claim.SubmissionDate,
+                HoursWorked = claim.Lecturer.HoursWorked,
+                HourlyRate = claim.Lecturer.HourlyRate,
+                TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
+                Comments = claim.Comments,
+                Filename = claim.Filename
+            };
+
+            // Automatically approve claims with a TotalAmount of <= 15000 (as per policy)
+            if (claimViewModel.TotalAmount <= 15000)
+            {
+                claim.ClaimStatus = "Approved";
+            }
+            else
+            {
+                // For claims above R15,000, manually approve after validation
+                var validationResult = await _validator.ValidateAsync(claimViewModel);
                 if (!validationResult.IsValid)
                 {
-                    return BadRequest(validationResult.Errors);
+                    return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
                 }
-
-                var claim = await _context.Claims.FindAsync(id);
-                if (claim == null)
-                {
-                    return NotFound(new { message = "Claim not found" });
-                }
-
-                // Calculate the total amount
-                var totalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate;
-
-                // Check if the total amount is less than or equal to R15,000
-                if (totalAmount <= 15000)
-                {
-                    // Automatically approve the claim
-                    claim.ClaimStatus = "Approved";
-                    await _context.SaveChangesAsync();
-                    return Ok(new { message = "Claim approved automatically due to policy" });
-                }
-                else
-                {
-                    // Proceed with the manual approval process
-                    claim.ClaimStatus = "Pending";
-                    await _context.SaveChangesAsync();
-                    return Ok(new { message = "Claim is pending manual approval" });
-                }
+                claim.ClaimStatus = "Approved";
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error approving claim", error = ex.Message });
-            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
-        [HttpPut("RejectClaim/{id}")]
-        public async Task<IActionResult> RejectClaim(int id, [FromBody] ClaimViewModel claimViewModel)
+        [HttpPost]
+        [Route("reject")]
+        public async Task<IActionResult> RejectClaim(int claimId)
         {
-            try
+            var claim = await _context.Claims.FindAsync(claimId);
+            if (claim == null)
             {
-                // Validate the incoming ClaimViewModel using FluentValidation
-                var validationResult = await _claimValidator.ValidateAsync(claimViewModel);
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest(validationResult.Errors);
-                }
-
-                var claim = await _context.Claims.FindAsync(id);
-                if (claim == null)
-                {
-                    return NotFound(new { message = "Claim not found" });
-                }
-
-                claim.ClaimStatus = "Rejected";
-                await _context.SaveChangesAsync();
-
-                return Ok(new { message = "Claim rejected successfully" });
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error rejecting claim", error = ex.Message });
-            }
+
+            claim.ClaimStatus = "Rejected";
+            await _context.SaveChangesAsync();
+            return Ok();
         }
     }
 }

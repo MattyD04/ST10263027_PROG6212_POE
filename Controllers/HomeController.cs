@@ -68,105 +68,11 @@ namespace ST10263027_PROG6212_POE.Controllers
         [AuthorisingRoles("Manager", "Coordinator")] //restricts access to the verifying of claims page to only be accessible by managers and coordinators
         public IActionResult VerifyClaims()
         {
-            var claimViewModels = _context.Claims
-                .Where(claim => claim.ClaimStatus == "Pending")
-                .Select(claim => new ClaimViewModel
-                {
-                    ClaimID = claim.ClaimID,
-                    ClaimNum = claim.ClaimNum,
-                    LecturerNum = claim.Lecturer.LecturerNum,
-                    SubmissionDate = claim.SubmissionDate,
-                    HoursWorked = claim.Lecturer.HoursWorked,
-                    HourlyRate = claim.Lecturer.HourlyRate,
-                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
-                    Comments = claim.Comments,
-                    Filename = claim.Filename
-                })
-                .ToList();
-
-            return View(claimViewModels);
+            return View();
         }
         //***************************************************************************************//
-        [HttpPost]
-        public async Task<IActionResult> ApproveClaim(int id, bool isManual = false)
-        //Corrections done by Claude AI to fix error that was preventing manual approval of claims that did not meet the standards for automatic approval
-        {
-            var claim = await _context.Claims.Include(c => c.Lecturer).FirstOrDefaultAsync(c => c.ClaimID == id);
-            if (claim != null)
-            {
-                // Check if Lecturer is null
-                if (claim.Lecturer == null)
-                {
-                    TempData["ErrorMessage"] = "Lecturer data is missing for this claim.";
-                    return RedirectToAction(nameof(VerifyClaims));
-                }
-
-                // Create a view model for validation
-                var claimViewModel = new ClaimViewModel
-                {
-                    ClaimID = claim.ClaimID,
-                    ClaimNum = claim.ClaimNum,
-                    LecturerNum = claim.Lecturer.LecturerNum,
-                    SubmissionDate = claim.SubmissionDate,
-                    HoursWorked = claim.Lecturer.HoursWorked,
-                    HourlyRate = claim.Lecturer.HourlyRate,
-                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
-                    Comments = claim.Comments,
-                    Filename = claim.Filename
-                };
-
-                // Validate the claim only for automatic approval, bypass for manual approval
-                if (!isManual)
-                {
-                    var validationResult = await _validator.ValidateAsync(claimViewModel);
-
-                    if (validationResult.IsValid)
-                    {
-                        claim.ClaimStatus = "Approved";
-                        TempData["SuccessMessage"] = "Claim has been automatically approved due to policy.";
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = string.Join(" ", validationResult.Errors.Select(e => e.ErrorMessage));
-                        return RedirectToAction(nameof(VerifyClaims));
-                    }
-                }
-                else
-                {
-                    // For manual approval, skip validation and directly approve
-                    claim.ClaimStatus = "Approved";
-                    TempData["SuccessMessage"] = "Claim has been approved successfully.";
-                }
-
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found.";
-            }
-
-            return RedirectToAction(nameof(VerifyClaims));
-        }
-
-        //***************************************************************************************//
-        [HttpPost]
-        public async Task<IActionResult> RejectClaim(int id)
-        {
-            var claim = await _context.Claims.FindAsync(id);
-            if (claim != null)
-            {
-                claim.ClaimStatus = "Rejected";
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Claim has been rejected successfully.";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Claim not found.";
-            }
-
-            return RedirectToAction(nameof(VerifyClaims));
-        }
-        //***************************************************************************************//
+        
+        
         public IActionResult LecturerLogin()
         {
             return View();

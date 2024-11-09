@@ -87,6 +87,14 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View();
         }
+        public IActionResult HumanResources()
+        {
+            return View();
+        }
+        public IActionResult HRDashboard()
+        {
+            return View();
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

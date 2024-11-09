@@ -67,10 +67,10 @@ namespace ST10263027_PROG6212_POE.Controllers
                 Filename = claim.Filename
             };
 
-            // Automatically approve claims with a TotalAmount of <= 15000 (as per policy)
+            // Automatically approve claims under R15,000
             if (claimViewModel.TotalAmount <= 15000)
             {
-                claim.ClaimStatus = "Approved";
+                return await ApproveClaimAutomatically(claim);
             }
             else
             {
@@ -81,10 +81,18 @@ namespace ST10263027_PROG6212_POE.Controllers
                     return BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
                 }
                 claim.ClaimStatus = "Approved";
+                await _context.SaveChangesAsync();
+                return Ok();
             }
+        }
 
+        private async Task<IActionResult> ApproveClaimAutomatically(Claim claim)
+        {
+            // Logic for automatically approving claims with TotalAmount <= 15000
+            claim.ClaimStatus = "Approved";
             await _context.SaveChangesAsync();
-            return Ok();
+
+            return Ok(new { Message = "Claim has been automatically approved due to policy." });
         }
 
         [HttpPost]
@@ -102,4 +110,5 @@ namespace ST10263027_PROG6212_POE.Controllers
             return Ok();
         }
     }
+
 }

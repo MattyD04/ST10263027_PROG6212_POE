@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ST10263027_PROG6212_POE.Models;
 using System.Security.Claims;
-//this file contains the DBSets for the Lecturer database which has tables for lecturers, coordinators, managers and the claim
+//this file contains the DBSets for the Lecturer database which has tables for lecturers, coordinators, managers, claims and human resources
 namespace ST10263027_PROG6212_POE.Data
 {
     public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
@@ -13,7 +13,7 @@ namespace ST10263027_PROG6212_POE.Data
         public DbSet<ProgrammeCoordinator> ProgrammeCoordinators { get; set; } // This represents the database table for Programme Coordinators entities which links to ProgrammeCoordinators model
         public DbSet<AcademicManager> AcademicManagers { get; set; } // This represents the database table for Academic Managers entities which links to AcademicManager model
         public DbSet<ST10263027_PROG6212_POE.Models.Claim> Claims { get; set; } // This represents the database table for Claims entities which links to Claims model
-
+        public DbSet<HumanResources> HumanResource { get; set; } //This represents the database table for the Human Resources entity which links to the HumanResources model
     }
 }
 //**************************************************end of file***********************************************//

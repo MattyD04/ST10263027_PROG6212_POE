@@ -232,7 +232,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             if (hrUser == null)
             {
-                hrUser = new HumanResources
+                hrUser = new HRDashboard
                 {
                     HumanResourcesNum = username,
                     Password = password
@@ -247,8 +247,19 @@ namespace ST10263027_PROG6212_POE.Controllers
                 return View("~/Views/Home/HumanResourcesLogin.cshtml");
             }
 
-            await _signInManager.SignInAsync(new IdentityUser { UserName = username }, isPersistent: false);
-            await _userManager.AddToRoleAsync(await _userManager.FindByNameAsync(username), "HumanResources");
+            var identityUser = await _userManager.FindByNameAsync(username);
+            if (identityUser == null)
+            {
+                identityUser = new IdentityUser { UserName = username };
+                await _userManager.CreateAsync(identityUser, password);
+            }
+
+            await _signInManager.SignInAsync(identityUser, isPersistent: false);
+
+            if (!await _userManager.IsInRoleAsync(identityUser, "HumanResources"))
+            {
+                await _userManager.AddToRoleAsync(identityUser, "HumanResources");
+            }
 
             return RedirectToAction("HRDashboard", "Home");
         }

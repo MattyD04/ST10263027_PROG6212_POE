@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ST10263027_PROG6212_POE.Roles;
 using System.ComponentModel.DataAnnotations;
 using FluentValidation;
+using ST10263027_PROG6212_POE.Views.Home;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
@@ -87,13 +88,15 @@ namespace ST10263027_PROG6212_POE.Controllers
         {
             return View();
         }
-        public IActionResult HumanResources()
+        public IActionResult HumanResourcesLogin()
         {
             return View();
         }
+        [AuthorisingRoles("HR")]
         public IActionResult HRDashboard()
         {
-            return View();
+            var model = new HRDashboard(); // Replace with actual data if needed
+            return View(model);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

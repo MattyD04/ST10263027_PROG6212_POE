@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ST10263027_PROG6212_POE</title>
+    <title>@ViewData["Title"] - Contract Monthly Claim System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ST10263027_PROG6212_POE.styles.css" asp-append-version="true" />
@@ -38,8 +38,14 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="VerifyClaims">Verify Claims</a>
                             </li>
                         }
+                        @if (HttpContextAccessor.HttpContext.Session.GetString("UserType") == "HR")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="HRDashboard">HR Dashboard</a>
+                            </li>
+                        }
                     </ul>
-                   
+
                     @if (HttpContextAccessor.HttpContext.Session.GetString("UserType") != null)
                     {
                         <ul class="navbar-nav ms-auto">
@@ -60,7 +66,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - ST10263027_PROG6212_POE - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - Contract Monthly Claim System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

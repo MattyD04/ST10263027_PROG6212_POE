@@ -13,7 +13,7 @@ namespace ST10263027_PROG6212_POE.Data
         public DbSet<ProgrammeCoordinator> ProgrammeCoordinators { get; set; } // This represents the database table for Programme Coordinators entities which links to ProgrammeCoordinators model
         public DbSet<AcademicManager> AcademicManagers { get; set; } // This represents the database table for Academic Managers entities which links to AcademicManager model
         public DbSet<ST10263027_PROG6212_POE.Models.Claim> Claims { get; set; } // This represents the database table for Claims entities which links to Claims model
-        public DbSet<HumanResources> HumanResource { get; set; } //This represents the database table for the Human Resources entity which links to the HumanResources model
+        public DbSet<HRDashboard> HumanResource { get; set; } //This represents the database table for the Human Resources entity which links to the HumanResources model
     }
 }
 //**************************************************end of file***********************************************//

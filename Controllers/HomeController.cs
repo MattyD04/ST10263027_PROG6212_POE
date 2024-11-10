@@ -93,11 +93,34 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
         [AuthorisingRoles("HR")]
-        public IActionResult HRDashboard()
+        public async Task<IActionResult> HRDashboard()
         {
-            var model = new HRDashboard(); // Replace with actual data if needed
-            return View(model);
+            var approvedClaims = await _context.Claims
+                .Include(c => c.Lecturer)
+                .Where(c => c.ClaimStatus == "Approved")
+                .Select(claim => new ClaimViewModel
+                {
+                    ClaimID = claim.ClaimID,
+                    ClaimNum = claim.ClaimNum,
+                    LecturerNum = claim.Lecturer.LecturerNum,
+                    SubmissionDate = claim.SubmissionDate,
+                    HoursWorked = claim.Lecturer.HoursWorked,
+                    HourlyRate = claim.Lecturer.HourlyRate,
+                    TotalAmount = claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate,
+                    Comments = claim.Comments,
+                    Filename = claim.Filename,
+                    ClaimStatus = claim.ClaimStatus
+                })
+                .ToListAsync();
+
+            var viewModel = new HRDashboardViewModel
+            {
+                ApprovedClaims = approvedClaims
+            };
+
+            return View(viewModel);
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

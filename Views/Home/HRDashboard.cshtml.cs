@@ -1,16 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ST10263027_PROG6212_POE.Models;  // Add this to reference your models
+using ST10263027_PROG6212_POE.Models;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using ST10263027_PROG6212_POE.Data;
 
 namespace ST10263027_PROG6212_POE.Views.Home
 {
     public class HRDashboardModel : PageModel
     {
-        public HRDashboard HRUser { get; set; }  // Property to hold the HR user data
+        private readonly AppDbContext _context;
 
-        public void OnGet()
+        public HRDashboardModel(AppDbContext context)
         {
-            HRUser = new HRDashboard();  // Initialize the property
+            _context = context;
         }
+
+        public List<ClaimViewModel> ApprovedClaims { get; set; }
+
+      
     }
 }

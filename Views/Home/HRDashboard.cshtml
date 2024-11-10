@@ -1,7 +1,175 @@
-﻿@page
-@model ST10263027_PROG6212_POE.Models.HRDashboard
+﻿@model ST10263027_PROG6212_POE.Models.HRDashboardViewModel
+@{
+    ViewData["Title"] = "HR Dashboard";
+}
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to HR Dashboard</h1>
-    <p>You have successfully logged in as an HR user.</p>
+<style>
+    body {
+        background: linear-gradient(skyblue, red);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    .header-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .display-4 {
+        text-align: center;
+        color: white;
+        padding: 20px 0;
+        margin: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-text {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: white;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        white-space: normal;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+
+    .alert {
+        padding: 15px;
+        margin: 20px auto;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        max-width: 1400px;
+    }
+
+    .alert-success {
+        color: #3c763d;
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    footer {
+    display: none;
+    }
+</style>
+
+<div class="header-container">
+    <h1 class="display-4">HR Dashboard</h1>
+</div>
+
+<div class="container">
+    <h2>Approved Claims</h2>
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Message"]
+        </div>
+    }
+
+    <div class="table-wrapper">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Claim ID</th>
+                    <th>Claim Number</th>
+                    <th>Lecturer Number</th>
+                    <th>Submission Date</th>
+                    <th>Hours Worked</th>
+                    <th>Hourly Rate</th>
+                    <th>Total Amount</th>
+                    <th>Comments</th>
+                    <th>Filename</th>
+                    <th>Claim Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ApprovedClaims != null && Model.ApprovedClaims.Any())
+                {
+                    foreach (var claim in Model.ApprovedClaims)
+                    {
+                        <tr>
+                            <td>@claim.ClaimID</td>
+                            <td>@claim.ClaimNum</td>
+                            <td>@claim.LecturerNum</td>
+                            <td>@claim.SubmissionDate.ToString("yyyy-MM-dd")</td>
+                            <td>@claim.HoursWorked</td>
+                            <td>R @claim.HourlyRate</td>
+                            <td>R @claim.TotalAmount</td>
+                            <td>@claim.Comments</td>
+                            <td>@claim.Filename</td>
+                            <td>@claim.ClaimStatus</td>
+                            <td>
+                                <form asp-action="GenerateInvoice" asp-controller="Home" method="post">
+                                    <input type="hidden" name="claimId" value="@claim.ClaimID" />
+                                    <button type="submit" class="btn btn-primary">Generate Invoice</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="11" class="text-center">No approved claims found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

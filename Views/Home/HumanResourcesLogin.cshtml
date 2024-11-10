@@ -8,25 +8,34 @@
         background-attachment: fixed;
     }
 
-    .card {
+    .header-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        text-align: center;
+        color: white;
+        padding: 10px 0;
+        margin: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .form-container {
+        max-width: 400px;
+        margin: 20px auto;
+        padding: 20px;
         background-color: #f9f9f9;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
     }
 
-    .card-header {
-        background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 8px 8px 0 0 !important;
+    .form-section {
+        margin-bottom: 20px;
     }
 
-    .card-header h2 {
-        color: white;
-        margin: 0;
-        padding: 10px 0;
-    }
-
-    .form-control {
+    input[type="text"],
+    input[type="password"] {
         width: 100%;
         padding: 10px;
         margin-bottom: 10px;
@@ -35,7 +44,7 @@
         box-sizing: border-box;
     }
 
-    .btn-primary {
+    button[type="submit"] {
         width: 100%;
         padding: 10px;
         background-color: #007bff;
@@ -46,19 +55,19 @@
         transition: all 0.3s ease;
     }
 
-    .btn-primary:hover,
-    .btn-primary:focus {
-        background-color: #0056b3;
-        box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
-        transform: translateY(-2px);
-    }
+        button[type="submit"]:hover,
+        button[type="submit"]:focus {
+            background-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+            transform: translateY(-2px);
+        }
 
-    .btn-primary:active {
-        background-color: #004085;
-        transform: translateY(1px);
-    }
+        button[type="submit"]:active {
+            background-color: #004085;
+            transform: translateY(1px);
+        }
 
-    .alert-danger {
+    .error-message {
         background-color: #f8d7da;
         color: #721c24;
         padding: 15px;
@@ -67,50 +76,45 @@
         border: 1px solid #f5c6cb;
     }
 
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #c3e6cb;
+    }
+
     footer {
         display: none;
     }
 </style>
-
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="text-center">Human Resources Login</h2>
-                </div>
-                <div class="card-body">
-                    @if (TempData["ErrorMessage"] != null)
-                    {
-                        <div class="alert alert-danger">
-                            @foreach (var line in TempData["ErrorMessage"].ToString().Split('\n'))
-                            {
-                                @line <br />
-                            }
-                        </div>
-                    }
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success">
-                            @TempData["SuccessMessage"]
-                        </div>
-                    }
-                    <form asp-controller="Login" asp-action="Login" method="post">
-                        <input type="hidden" name="isHR" value="true" />
-                        <div class="form-group mb-3">
-                            <label for="username">HR Number:</label>
-                            <input type="text" class="form-control" id="username" name="username" required />
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="password">Password:</label>
-                            <input type="password" class="form-control" id="password" name="password" required />
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Login</button>
-                        </div>
-                    </form>
-                </div>
+<div class="form-container">
+    <div class="form-section">
+        <h1>Human Resources Login</h1>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="error-message">
+                @foreach (var line in TempData["ErrorMessage"].ToString().Split('\n'))
+                {
+                    @line <br />
+                }
             </div>
-        </div>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="success-message">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        <form asp-action="Login" asp-controller="Login" method="post">
+            <p>Please enter your login details:</p>
+            <p>HR Number:</p>
+            <input type="text" name="username" placeholder="HR Number" required />
+            <p>Password:</p>
+            <input type="password" name="password" placeholder="Password" required />
+            <input type="hidden" name="isHR" value="true" />
+            <button type="submit">Login</button>
+        </form>
     </div>
 </div>

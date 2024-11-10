@@ -5,16 +5,30 @@ VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ST10263027_PROG6212_POE", "ST10263027_PROG6212_POE.csproj", "{E6C49C4E-015E-4CA8-BA2F-80414CFF28D5}"
 EndProject
+Project("{F14B399A-7131-4C87-9E4B-1186C45EF12D}") = "LecturerInvoices", "..\LecturerInvoices\LecturerInvoices.rptproj", "{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		DebugLocal|Any CPU = DebugLocal|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E6C49C4E-015E-4CA8-BA2F-80414CFF28D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E6C49C4E-015E-4CA8-BA2F-80414CFF28D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6C49C4E-015E-4CA8-BA2F-80414CFF28D5}.DebugLocal|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6C49C4E-015E-4CA8-BA2F-80414CFF28D5}.DebugLocal|Any CPU.Build.0 = Debug|Any CPU
 		{E6C49C4E-015E-4CA8-BA2F-80414CFF28D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6C49C4E-015E-4CA8-BA2F-80414CFF28D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.Debug|Any CPU.ActiveCfg = Debug
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.Debug|Any CPU.Build.0 = Debug
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.Debug|Any CPU.Deploy.0 = Debug
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.DebugLocal|Any CPU.ActiveCfg = DebugLocal
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.DebugLocal|Any CPU.Build.0 = DebugLocal
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.DebugLocal|Any CPU.Deploy.0 = DebugLocal
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.Release|Any CPU.ActiveCfg = Release
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.Release|Any CPU.Build.0 = Release
+		{C4EC4355-4FFF-49C3-A9CD-A8DCA0DAFD5F}.Release|Any CPU.Deploy.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

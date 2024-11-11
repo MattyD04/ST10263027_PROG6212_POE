@@ -104,7 +104,7 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
         [AuthorisingRoles("HR")]
-        public async Task<IActionResult> HRDashboard()
+        public async Task<IActionResult> HRDashboard() //method for putting all the approved claims into the table in the HR Dashboard
         {
             var approvedClaims = await _context.Claims
                 .Include(c => c.Lecturer)

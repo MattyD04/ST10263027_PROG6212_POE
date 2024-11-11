@@ -14,16 +14,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Reporting.WebForms;
 using System.IO;
 using System.Data;
+using System.Net;
 
 namespace ST10263027_PROG6212_POE.Controllers
 {
     public class HomeController : Controller
     {
-            private readonly ILogger<HomeController> _logger;
-            private readonly AppDbContext _context;
-            private readonly IValidator<ClaimViewModel> _validator;
-            private readonly string _reportServerUrl;
-            private readonly IConfiguration _configuration;
+        private readonly ILogger<HomeController> _logger;
+        private readonly AppDbContext _context;
+        private readonly IValidator<ClaimViewModel> _validator;
+        private readonly string _reportServerUrl;
+        private readonly IConfiguration _configuration;
 
         public HomeController(ILogger<HomeController> logger,
                      AppDbContext context,
@@ -82,8 +83,8 @@ namespace ST10263027_PROG6212_POE.Controllers
             return View();
         }
         //***************************************************************************************//
-        
-        
+
+
         public IActionResult LecturerLogin()
         {
             return View();
@@ -130,72 +131,39 @@ namespace ST10263027_PROG6212_POE.Controllers
 
             return View(viewModel);
         }
+        private string GetReportUrl(int claimId)
+        {
+            var reportUrl = $"{_reportServerUrl}/Reports/render/ClaimInvoice?rs:Format=PDF&ClaimID={claimId}";
+            _logger.LogInformation("Generated report URL: " + reportUrl);
+            return reportUrl;
+        }
+
         [HttpPost]
         [AuthorisingRoles("HR")]
         public async Task<IActionResult> GenerateInvoice(int claimId)
         {
             try
             {
-                // Fetch the claim details with related lecturer information
-                var claim = await _context.Claims
-                    .Include(c => c.Lecturer)
-                    .FirstOrDefaultAsync(c => c.ClaimID == claimId);
+                var reportUrl = GetReportUrl(claimId);
 
-                if (claim == null)
-                {
-                    TempData["Error"] = "Claim not found.";
-                    return RedirectToAction("HRDashboard");
-                }
+                using var httpClient = new HttpClient();
+                var response = await httpClient.GetAsync(reportUrl);
+                response.EnsureSuccessStatusCode();
 
-                // Create the report viewer and set its properties
-                var reportViewer = new ReportViewer
-                {
-                    ProcessingMode = ProcessingMode.Remote,
-                    SizeToReportContent = true,
-                    ServerReport = {
-                    ReportServerUrl = new Uri(_reportServerUrl),
-                    ReportPath = "/LecturerInvoices/LecturerInvoice"
-                }
-                };
-
-                // Create parameters for the report
-                var parameters = new List<ReportParameter>
-            {
-                new ReportParameter("ClaimID", claim.ClaimID.ToString()),
-                new ReportParameter("ClaimNumber", claim.ClaimNum),
-                new ReportParameter("LecturerNumber", claim.Lecturer.LecturerNum),
-                new ReportParameter("SubmissionDate", claim.SubmissionDate.ToString("yyyy-MM-dd")),
-                new ReportParameter("HoursWorked", claim.Lecturer.HoursWorked.ToString()),
-                new ReportParameter("HourlyRate", claim.Lecturer.HourlyRate.ToString("C")),
-                new ReportParameter("TotalAmount", (claim.Lecturer.HoursWorked * claim.Lecturer.HourlyRate).ToString("C")),
-                new ReportParameter("InvoiceDate", DateTime.Now.ToString("yyyy-MM-dd"))
-            };
-
-                reportViewer.ServerReport.SetParameters(parameters);
-
-                // Render the report to PDF
-                byte[] bytes = reportViewer.ServerReport.Render("PDF");
-
-                // Generate a unique filename
-                string fileName = $"Invoice_{claim.ClaimNum}_{DateTime.Now:yyyyMMddHHmmss}.pdf";
-
-                // Update the claim to mark invoice as generated
-                claim.InvoiceGenerated = true;
-                claim.InvoiceGeneratedDate = DateTime.Now;
-                await _context.SaveChangesAsync();
-
-                // Return the PDF file
-                return File(bytes, "application/pdf", fileName);
+                var pdfBytes = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfBytes, "application/pdf", $"Invoice_{claimId}_{DateTime.Now:yyyyMMdd}.pdf");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error generating invoice: {ex.Message}");
-                TempData["Error"] = "Error generating invoice. Please try again later.";
+                TempData["Message"] = "Error generating invoice: " + ex.Message;
                 return RedirectToAction("HRDashboard");
             }
         }
 
-            [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+
+
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

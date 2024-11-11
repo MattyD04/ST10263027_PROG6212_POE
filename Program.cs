@@ -3,6 +3,10 @@ using ST10263027_PROG6212_POE.Data;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Reporting.WebForms;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register FluentValidation services
 builder.Services.AddControllersWithViews()
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ClaimViewModelValidator>()); // Register validators
+    .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ClaimViewModelValidator>());
 
 // Add Identity services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
@@ -29,6 +33,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true; // Required for GDPR compliance
 });
+
+// Load SSRS settings into the application services
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 var app = builder.Build();
 

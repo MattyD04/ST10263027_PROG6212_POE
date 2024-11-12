@@ -5,7 +5,7 @@
 
 <style>
     body {
-        background: linear-gradient(skyblue, red);
+        background: linear-gradient(to bottom, #87CEEB, #FF0000);
         background-repeat: no-repeat;
         background-attachment: fixed;
         font-family: Arial, sans-serif;
@@ -103,8 +103,30 @@
         background-color: rgba(0, 0, 0, 0.05);
     }
 
+    .password-input {
+        width: 150px;
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .password-update-btn {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .password-update-btn:hover {
+        background-color: #45a049;
+    }
+
     footer {
-    display: none;
+        display: none;
     }
 </style>
 
@@ -116,63 +138,65 @@
     <h2>Approved Claims</h2>
     @if (TempData["Message"] != null)
     {
-        <div class="alert alert-success">
+            <div class="alert alert-success">
             @TempData["Message"]
-        </div>
+            </div>
     }
 
     <div class="table-wrapper">
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Claim ID</th>
-                    <th>Claim Number</th>
-                    <th>Lecturer Number</th>
-                    <th>Submission Date</th>
-                    <th>Hours Worked</th>
-                    <th>Hourly Rate</th>
-                    <th>Total Amount</th>
-                    <th>Comments</th>
-                    <th>Filename</th>
-                    <th>Claim Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.ApprovedClaims != null && Model.ApprovedClaims.Any())
-                {
-                    foreach (var claim in Model.ApprovedClaims)
-                    {
-                        <tr>
-                            <td>@claim.ClaimID</td>
-                            <td>@claim.ClaimNum</td>
-                            <td>@claim.LecturerNum</td>
-                            <td>@claim.SubmissionDate.ToString("yyyy-MM-dd")</td>
-                            <td>@claim.HoursWorked</td>
-                            <td>R @claim.HourlyRate</td>
-                            <td>R @claim.TotalAmount</td>
-                            <td>@claim.Comments</td>
-                            <td>@claim.Filename</td>
-                            <td>@claim.ClaimStatus</td>
-                            <td>
-                                <form asp-action="GenerateInvoice" asp-controller="Home" method="post">
-                                    <input type="hidden" name="claimId" value="@claim.ClaimID" />
-                                    <button type="submit" class="btn btn-primary">Generate Invoice</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
+        <form asp-action="GenerateInvoice" asp-controller="Home" method="post">
+            <table class="table table-bordered table-striped">
+                <thead>
                     <tr>
-                        <td colspan="11" class="text-center">No approved claims found.</td>
+                        <th>Claim ID</th>
+                        <th>Claim Number</th>
+                        <th>Lecturer Number</th>
+                        <th>Submission Date</th>
+                        <th>Hours Worked</th>
+                        <th>Hourly Rate</th>
+                        <th>Total Amount</th>
+                        <th>Comments</th>
+                        <th>Filename</th>
+                        <th>Claim Status</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (Model.ApprovedClaims != null && Model.ApprovedClaims.Any())
+                    {
+                        foreach (var claim in Model.ApprovedClaims)
+                        {
+                                    <tr>
+                                        <td>@claim.ClaimID</td>
+                                        <td>@claim.ClaimNum</td>
+                                        <td>@claim.LecturerNum</td>
+                                        <td>@claim.SubmissionDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@claim.HoursWorked</td>
+                                        <td>R @claim.HourlyRate</td>
+                                        <td>R @claim.TotalAmount</td>
+                                        <td>@claim.Comments</td>
+                                        <td>@claim.Filename</td>
+                                        <td>@claim.ClaimStatus</td>
+                                        <td>
+                                            <input type="hidden" name="claimId" value="@claim.ClaimID" />
+                                            <button type="submit" class="btn btn-primary">Generate Invoice</button>
+                                        </td>
+                                    </tr>
+                        }
+                    }
+                    else
+                    {
+                            <tr>
+                                <td colspan="11" class="text-center">No approved claims found.</td>
+                            </tr>
+                    }
+                </tbody>
+            </table>
+        </form>
     </div>
 </div>
+
+<div style="height: 40px;"></div>
 
 <div class="container">
     <h2>Lecturer Data</h2>
@@ -184,6 +208,7 @@
                     <th>Lecturer Number</th>
                     <th>Hourly Rate</th>
                     <th>Hours Worked</th>
+                    <th>Change Password</th>
                 </tr>
             </thead>
             <tbody>
@@ -196,13 +221,17 @@
                                     <td>@lecturer.LecturerNum</td>
                                     <td>R @lecturer.HourlyRate</td>
                                     <td>@lecturer.HoursWorked</td>
+                                    <td>
+                                        <input type="password" class="password-input" placeholder="New Password" />
+                                        <button class="password-update-btn">Update</button>
+                                    </td>
                                 </tr>
                     }
                 }
                 else
                 {
                         <tr>
-                            <td colspan="4" class="text-center">No lecturer data found.</td>
+                            <td colspan="5" class="text-center">No lecturer data found.</td>
                         </tr>
                 }
             </tbody>

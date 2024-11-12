@@ -123,10 +123,11 @@ namespace ST10263027_PROG6212_POE.Controllers
                     ClaimStatus = claim.ClaimStatus
                 })
                 .ToListAsync();
-
+            var lecturers = await _context.Lecturers.ToListAsync();
             var viewModel = new HRDashboardViewModel
             {
-                ApprovedClaims = approvedClaims
+                ApprovedClaims = approvedClaims,
+                Lecturers = lecturers
             };
 
             return View(viewModel);

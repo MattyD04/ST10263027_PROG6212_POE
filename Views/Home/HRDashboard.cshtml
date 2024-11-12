@@ -173,3 +173,39 @@
         </table>
     </div>
 </div>
+
+<div class="container">
+    <h2>Lecturer Data</h2>
+    <div class="table-wrapper">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Lecturer ID</th>
+                    <th>Lecturer Number</th>
+                    <th>Hourly Rate</th>
+                    <th>Hours Worked</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Lecturers != null && Model.Lecturers.Any())
+                {
+                    foreach (var lecturer in Model.Lecturers)
+                    {
+                                <tr>
+                                    <td>@lecturer.LecturerId</td>
+                                    <td>@lecturer.LecturerNum</td>
+                                    <td>R @lecturer.HourlyRate</td>
+                                    <td>@lecturer.HoursWorked</td>
+                                </tr>
+                    }
+                }
+                else
+                {
+                        <tr>
+                            <td colspan="4" class="text-center">No lecturer data found.</td>
+                        </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

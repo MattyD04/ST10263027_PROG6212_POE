@@ -222,9 +222,9 @@
                                     <td>R @lecturer.HourlyRate</td>
                                     <td>@lecturer.HoursWorked</td>
                                     <td>
-                                        <input type="password" class="password-input" placeholder="New Password" />
-                                        <button class="password-update-btn">Update</button>
-                                    </td>
+                                        <input type="password" class="password-input" id="password-@lecturer.LecturerId" placeholder="New Password" />
+                                        <button class="password-update-btn" onclick="updatePassword(@lecturer.LecturerId)">Update</button>
+</td>
                                 </tr>
                     }
                 }
@@ -238,3 +238,61 @@
         </table>
     </div>
 </div>
+@section Scripts {
+        <script>
+            function updatePassword(lecturerId) {
+                // Get the password input element
+                const passwordInput = document.getElementById(`password-${lecturerId}`);
+                const newPassword = passwordInput.value;
+
+                // Validate password is not empty
+                if (!newPassword) {
+                    alert('Please enter a new password');
+                    return;
+                }
+
+                // Log the values being sent (for debugging)
+                console.log('Updating password for lecturer:', lecturerId);
+                console.log('New password length:', newPassword.length);
+
+                // Send the update request
+                fetch('/Home/UpdateLecturerPassword', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `lecturerId=${lecturerId}&newPassword=${encodeURIComponent(newPassword)}`
+                })
+                .then(response => {
+                    console.log('Response status:', response.status); // Debug response status
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data); // Debug response data
+                    if (data.success) {
+                        alert('Password updated successfully');
+                        passwordInput.value = ''; // Clear the password field
+                    } else {
+                        alert(data.message || 'Error updating password');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating password:', error);
+                    alert('Error updating password. Please check the console for details.');
+                });
+            }
+
+            // Add event listeners for enter key on password inputs
+            document.addEventListener('DOMContentLoaded', function() {
+                const passwordInputs = document.querySelectorAll('input[id^="password-"]');
+                passwordInputs.forEach(input => {
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            const lecturerId = this.id.split('-')[1];
+                            updatePassword(lecturerId);
+                        }
+                    });
+                });
+            });
+        </script>
+}

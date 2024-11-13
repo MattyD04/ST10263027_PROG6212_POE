@@ -162,7 +162,28 @@ namespace ST10263027_PROG6212_POE.Controllers
         }
 
 
+        [HttpPost]
+        [AuthorisingRoles("HR")]
+        public async Task<IActionResult> UpdateLecturerPassword(int lecturerId, string newPassword)
+        {
+            try
+            {
+                var lecturer = await _context.Lecturers.FindAsync(lecturerId);
+                if (lecturer == null)
+                {
+                    return Json(new { success = false, message = "Lecturer not found" });
+                }
 
+                lecturer.Password = newPassword;
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Password updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error updating password" });
+            }
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -21,7 +21,7 @@ namespace ST10263027_PROG6212_POE.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitClaim(
+        public async Task<IActionResult> SubmitClaim( //this method is for handling the submitting of claims by a lecturer (corrections by ChatGPT to fix file submission errors)
             string lecturer_number,
             string claim_number,
             DateTime submissionDate,
@@ -38,7 +38,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                 {
                     if (file.Length > MaxFileSizeBytes)
                     {
-                        ModelState.AddModelError("file", "The file size exceeds the limit of 5 MB.");
+                        ModelState.AddModelError("file", "The file size exceeds the limit of 5 MB."); //error message that displays if a file exceeds a limit of 5MB
                         TempData["ErrorMessage"] = "The file size exceeds the limit of 5 MB.";
                         return View();
                     }
@@ -49,7 +49,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                     if (!allowedExtensions.Contains(fileExtension))
                     {
                         ModelState.AddModelError("file", "Only .pdf, .docx, and .xlsx files are allowed.");
-                        TempData["ErrorMessage"] = "Only .pdf, .docx, and .xlsx files are allowed.";
+                        TempData["ErrorMessage"] = "Only .pdf, .docx, and .xlsx files are allowed."; //error message that displays if the file submitted is not of a specific file type
                         return View();
                     }
                 }
@@ -57,7 +57,7 @@ namespace ST10263027_PROG6212_POE.Controllers
                 // Creates Lecturer object if it does not exist
                 var lecturer = new Lecturer
                 {
-                    LecturerNum = lecturer_number,
+                    LecturerNum = lecturer_number, 
                     HourlyRate = hourlyRate,
                     HoursWorked = hoursWorked,
                     Password = "default_password" // Assigns a default password (for error handling)

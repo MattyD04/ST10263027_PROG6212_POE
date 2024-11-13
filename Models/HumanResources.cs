@@ -17,3 +17,4 @@ namespace ST10263027_PROG6212_POE.Models
         public string Password { get; set; } // Password for Human Resources
     }
 }
+//**************************************************end of file***********************************************//
